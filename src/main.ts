@@ -1,4 +1,5 @@
 import "./style.css";
+import { showCandleFallback } from "./candleFallback";
 
 type Product = {
   name: string;
@@ -440,7 +441,10 @@ const startHero = () => {
         disposeHero = mountCandle3D(candleMount);
       }
     })
-    .catch((error) => console.error("Não foi possível carregar a vela 3D principal.", error))
+    .catch((error) => {
+      showCandleFallback(candleMount, { lit: true, message: "Visualização leve da vela" });
+      console.error("Não foi possível carregar a vela 3D principal.", error);
+    })
     .finally(() => {
       heroLoad = undefined;
     });
@@ -484,7 +488,13 @@ const startRitual = () => {
         ritual3d = mountRitual3D(ritual3dMount, enterSite);
       }
     })
-    .catch((error) => console.error("Não foi possível carregar o ritual 3D.", error))
+    .catch((error) => {
+      showCandleFallback(ritual3dMount, {
+        message: "Toque na vela para continuar",
+        onActivate: enterSite,
+      });
+      console.error("Não foi possível carregar o ritual 3D.", error);
+    })
     .finally(() => {
       ritualLoad = undefined;
     });
@@ -522,7 +532,10 @@ const startBurnCandle = () => {
       burnCandle3d = mountBurnCandle3D(burnCandleMount);
       burnCandle3d.setProgress(burnProgress);
     })
-    .catch((error) => console.error("Não foi possível carregar a demonstração 3D.", error))
+    .catch((error) => {
+      showCandleFallback(burnCandleMount, { lit: true, message: "Visualização leve da vela" });
+      console.error("Não foi possível carregar a demonstração 3D.", error);
+    })
     .finally(() => {
       burnLoad = undefined;
     });

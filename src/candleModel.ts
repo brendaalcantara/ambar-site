@@ -234,7 +234,7 @@ function makeWaxGeometry(segments: number): THREE.LatheGeometry {
   return geometry;
 }
 
-export function createFlameVfx(): {
+export function createFlameVfx(quality: CandleQuality = "desktop"): {
   group: THREE.Group;
   light: THREE.PointLight;
   material: THREE.ShaderMaterial;
@@ -300,7 +300,12 @@ export function createFlameVfx(): {
     `,
   });
   const group = new THREE.Group();
-  const planeGeometry = new THREE.PlaneGeometry(.5, .86, 10, 18);
+  const planeGeometry = new THREE.PlaneGeometry(
+    .5,
+    .86,
+    quality === "mobile" ? 6 : 10,
+    quality === "mobile" ? 12 : 18,
+  );
   planeGeometry.translate(0, .36, 0);
   const front = new THREE.Mesh(planeGeometry, material);
   const cross = new THREE.Mesh(planeGeometry, material);
@@ -359,7 +364,7 @@ function makeSmoke(quality: CandleQuality): {
   const texture = new THREE.CanvasTexture(textureCanvas);
   texture.colorSpace = THREE.SRGBColorSpace;
 
-  const count = quality === "mobile" ? 10 : 16;
+  const count = quality === "mobile" ? 8 : 16;
   const random = seededNoise(2718);
   const group = new THREE.Group();
   const particles: Array<{
@@ -467,22 +472,32 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
   const waxBump = makeNoiseTexture(quality === "mobile" ? 96 : 192, 41, 36);
   resources.push(waxBump);
 
-  const glassMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0xe8eee7,
-    roughness: .055,
-    metalness: 0,
-    transmission: .98,
-    thickness: .22,
-    ior: 1.48,
-    attenuationColor: new THREE.Color(0xdbe2d7),
-    attenuationDistance: 3.8,
-    clearcoat: .32,
-    clearcoatRoughness: .08,
-    transparent: true,
-    opacity: 1,
-    depthWrite: false,
-    side: THREE.FrontSide,
-  });
+  const glassMaterial = quality === "mobile"
+    ? new THREE.MeshStandardMaterial({
+        color: 0xe5ece5,
+        roughness: .16,
+        metalness: 0,
+        transparent: true,
+        opacity: .28,
+        depthWrite: false,
+        side: THREE.FrontSide,
+      })
+    : new THREE.MeshPhysicalMaterial({
+        color: 0xe8eee7,
+        roughness: .055,
+        metalness: 0,
+        transmission: .98,
+        thickness: .22,
+        ior: 1.48,
+        attenuationColor: new THREE.Color(0xdbe2d7),
+        attenuationDistance: 3.8,
+        clearcoat: .32,
+        clearcoatRoughness: .08,
+        transparent: true,
+        opacity: 1,
+        depthWrite: false,
+        side: THREE.FrontSide,
+      });
   const jarGeometry = makeJarGeometry(segments);
   const jar = new THREE.Mesh(jarGeometry, glassMaterial);
   jar.renderOrder = 1;
@@ -491,15 +506,22 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
   group.add(jar);
   resources.push(glassMaterial, jarGeometry);
 
-  const waxMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0xeee5d7,
-    roughness: .78,
-    sheen: .16,
-    sheenColor: new THREE.Color(0xfff5dd),
-    sheenRoughness: .86,
-    bumpMap: waxBump,
-    bumpScale: .018,
-  });
+  const waxMaterial = quality === "mobile"
+    ? new THREE.MeshStandardMaterial({
+        color: 0xeee5d7,
+        roughness: .8,
+        bumpMap: waxBump,
+        bumpScale: .014,
+      })
+    : new THREE.MeshPhysicalMaterial({
+        color: 0xeee5d7,
+        roughness: .78,
+        sheen: .16,
+        sheenColor: new THREE.Color(0xfff5dd),
+        sheenRoughness: .86,
+        bumpMap: waxBump,
+        bumpScale: .018,
+      });
   const waxGeometry = makeWaxGeometry(segments);
   const wax = new THREE.Mesh(waxGeometry, waxMaterial);
   wax.position.y = .18;
@@ -507,7 +529,9 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
   group.add(wax);
   resources.push(waxMaterial, waxGeometry);
 
-  const meltMaterial = new THREE.MeshPhysicalMaterial({ color: 0xf5ecdc, roughness: .34, clearcoat: .28, clearcoatRoughness: .18 });
+  const meltMaterial = quality === "mobile"
+    ? new THREE.MeshStandardMaterial({ color: 0xf5ecdc, roughness: .38 })
+    : new THREE.MeshPhysicalMaterial({ color: 0xf5ecdc, roughness: .34, clearcoat: .28, clearcoatRoughness: .18 });
   const meltPool = new THREE.Mesh(new THREE.RingGeometry(.23, .72, segments, 4), meltMaterial);
   meltPool.rotation.x = -Math.PI / 2;
   meltPool.position.y = 1.892;
@@ -564,7 +588,7 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
     group.add(lid);
   }
 
-  const flame = createFlameVfx();
+  const flame = createFlameVfx(quality);
   flame.group.position.y = 2.135;
   flame.group.scale.set(.55, .58, .55);
   flame.group.visible = lit;

@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { createCandleModel, type CandleQuality } from "./candleModel";
+import { bindWebGLFallback } from "./candleFallback";
 
 function makeCircularShadowTexture(): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
@@ -33,8 +34,15 @@ export function mountCandle3D(container: HTMLElement): () => void {
   camera.position.set(0, 2.38, 5.2);
   camera.lookAt(0, 1.02, 0);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1.2 : 1.6));
+  const renderer = new THREE.WebGLRenderer({
+    antialias: quality === "desktop",
+    alpha: true,
+    depth: true,
+    stencil: false,
+    precision: quality === "mobile" ? "mediump" : "highp",
+    powerPreference: quality === "mobile" ? "default" : "high-performance",
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1 : 1.6));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = .88;
@@ -42,14 +50,21 @@ export function mountCandle3D(container: HTMLElement): () => void {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.replaceChildren(renderer.domElement);
   renderer.domElement.setAttribute("aria-label", "Vela aromática Black Vanilla em 3D. Arraste para girar.");
+  const disposeContextFallback = bindWebGLFallback(renderer.domElement, container, {
+    lit: true,
+    message: "Modo compatível da vela",
+  });
 
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const room = new RoomEnvironment();
-  const environment = pmrem.fromScene(room, .045);
-  scene.environment = environment.texture;
-  scene.environmentIntensity = .82;
-  room.dispose();
-  pmrem.dispose();
+  let environment: THREE.WebGLRenderTarget | undefined;
+  if (quality === "desktop") {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const room = new RoomEnvironment();
+    environment = pmrem.fromScene(room, .035);
+    scene.environment = environment.texture;
+    scene.environmentIntensity = .82;
+    room.dispose();
+    pmrem.dispose();
+  }
 
   scene.add(new THREE.HemisphereLight(0xfff5df, 0x71513c, .9));
   const key = new THREE.DirectionalLight(0xffe3b7, 2.05);
@@ -94,6 +109,7 @@ export function mountCandle3D(container: HTMLElement): () => void {
 
   let visible = true;
   let disposed = false;
+  let lastFrame = 0;
   const clock = new THREE.Clock();
   const intersectionObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }, { threshold: .05 });
   intersectionObserver.observe(container);
@@ -111,8 +127,10 @@ export function mountCandle3D(container: HTMLElement): () => void {
   resizeObserver.observe(container);
   resize();
 
-  renderer.setAnimationLoop(() => {
+  renderer.setAnimationLoop((time) => {
     if (disposed || !visible) return;
+    if (quality === "mobile" && time - lastFrame < 1000 / 30) return;
+    lastFrame = time;
     const elapsed = clock.getElapsedTime();
     controls.autoRotate = !reducedMotionQuery.matches;
     controls.update();
@@ -126,12 +144,13 @@ export function mountCandle3D(container: HTMLElement): () => void {
     resizeObserver.disconnect();
     intersectionObserver.disconnect();
     document.removeEventListener("visibilitychange", onVisibility);
+    disposeContextFallback();
     controls.dispose();
     candle.dispose();
     circularShadow.geometry.dispose();
     circularShadowMaterial.dispose();
     circularShadowTexture.dispose();
-    environment.dispose();
+    environment?.dispose();
     renderer.dispose();
   };
 }

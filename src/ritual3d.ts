@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { createCandleModel, createFlameVfx, type CandleQuality } from "./candleModel";
+import { bindWebGLFallback } from "./candleFallback";
 
 type MatchModel = {
   group: THREE.Group;
@@ -167,8 +168,15 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
   const camera = new THREE.PerspectiveCamera(34, 1, .1, 40);
   camera.position.set(0, 2.28, quality === "mobile" ? 6.4 : 6.8);
   camera.lookAt(0, 1.18, 0);
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1.1 : 1.45));
+  const renderer = new THREE.WebGLRenderer({
+    antialias: quality === "desktop",
+    alpha: true,
+    depth: true,
+    stencil: false,
+    precision: quality === "mobile" ? "mediump" : "highp",
+    powerPreference: quality === "mobile" ? "default" : "high-performance",
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1 : 1.45));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.0;
@@ -176,14 +184,20 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.replaceChildren(renderer.domElement);
   renderer.domElement.setAttribute("aria-label", "Arraste a cabeça do fósforo 3D até o pavio da vela");
+  const disposeContextFallback = bindWebGLFallback(renderer.domElement, container, {
+    message: "Use entrar sem acender para continuar",
+  });
 
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const room = new RoomEnvironment();
-  const environment = pmrem.fromScene(room, .05);
-  scene.environment = environment.texture;
-  scene.environmentIntensity = .28;
-  room.dispose();
-  pmrem.dispose();
+  let environment: THREE.WebGLRenderTarget | undefined;
+  if (quality === "desktop") {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const room = new RoomEnvironment();
+    environment = pmrem.fromScene(room, .035);
+    scene.environment = environment.texture;
+    scene.environmentIntensity = .28;
+    room.dispose();
+    pmrem.dispose();
+  }
 
   scene.add(new THREE.HemisphereLight(0x5e4939, 0x100d0b, .48));
   const rim = new THREE.DirectionalLight(0xc08b54, 1.18);
@@ -213,7 +227,7 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
   }
   scene.add(match.group);
 
-  const matchFlame = createFlameVfx();
+  const matchFlame = createFlameVfx(quality);
   matchFlame.group.visible = false;
   matchFlame.group.scale.set(.57, .6, .57);
   matchFlame.group.position.set(.69, -.035, 0);
@@ -229,6 +243,7 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
   let completed = false;
   let igniteTime = -99;
   let snapStartTime = -99;
+  let lastFrame = 0;
   const clock = new THREE.Clock();
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -436,8 +451,10 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
   resizeObserver.observe(container);
   resize();
 
-  renderer.setAnimationLoop(() => {
+  renderer.setAnimationLoop((time) => {
     if (disposed || !pageVisible) return;
+    if (quality === "mobile" && time - lastFrame < 1000 / 40) return;
+    lastFrame = time;
     const elapsed = clock.getElapsedTime();
     candle.update(elapsed, reducedMotionQuery.matches);
     if (matchFlame.group.visible) matchFlame.update(elapsed, reducedMotionQuery.matches);
@@ -486,6 +503,7 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
       renderer.setAnimationLoop(null);
       resizeObserver.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
+      disposeContextFallback();
       renderer.domElement.removeEventListener("pointerdown", onPointerDown);
       renderer.domElement.removeEventListener("pointermove", onPointerMove);
       renderer.domElement.removeEventListener("pointerup", onPointerUp);
@@ -494,7 +512,7 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
       match.dispose();
       matchFlame.dispose();
       embers.dispose();
-      environment.dispose();
+      environment?.dispose();
       renderer.dispose();
     },
   };
