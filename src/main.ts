@@ -1,7 +1,4 @@
 import "./style.css";
-import { mountCandle3D } from "./candle3d";
-import { mountBurnCandle3D } from "./burnCandle3d";
-import { mountRitual3D } from "./ritual3d";
 
 type Product = {
   name: string;
@@ -20,6 +17,17 @@ type Spray = {
   profile: string;
   image: string;
   imagePosition: string;
+};
+
+type Ritual3DController = {
+  ignite: () => void;
+  getCandleScreenPosition: () => { x: number; y: number };
+  dispose: () => void;
+};
+
+type BurnCandleController = {
+  setProgress: (progress: number) => void;
+  dispose: () => void;
 };
 
 const assetUrl = (path: string) =>
@@ -270,7 +278,7 @@ app.innerHTML = `
       <section class="home-spray-section" id="home-sprays">
         <div class="home-spray">
           <div class="catalog-scene catalog-scene--spray">
-            <img src="${assetUrl("products/collection-detail.jpg")}" alt="Coleção de velas e home sprays Ámbar Essence">
+            <img src="${assetUrl("products/collection-detail.jpg")}" alt="Coleção de velas e home sprays Ámbar Essence" loading="lazy" decoding="async">
             <span class="scene-caption">7 aromas<br>para a casa</span>
           </div>
           <div class="home-spray-copy">
@@ -303,11 +311,11 @@ app.innerHTML = `
         </div>
         <div class="special-grid">
           <article class="special-card">
-            <div class="special-photo"><img src="${assetUrl("products/moscow-mule.jpg")}" alt="Vela Moscow Mule Ámbar Essence" loading="lazy"></div>
+            <div class="special-photo"><img src="${assetUrl("products/moscow-mule.jpg")}" alt="Vela Moscow Mule Ámbar Essence" loading="lazy" decoding="async"></div>
             <div class="special-info"><span>Edição especial · 150g</span><h4>Moscow Mule</h4><p>Limão siciliano e baunilha em cera de coco. Aproximadamente 30 horas de queima.</p><a href="${whatsappUrl("a vela Moscow Mule")}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
           </article>
           <article class="special-card special-card--reverse">
-            <div class="special-photo"><img src="${assetUrl("products/coconut-candle.jpg")}" alt="Vela artesanal em casca de coco Ámbar Essence" loading="lazy"></div>
+            <div class="special-photo"><img src="${assetUrl("products/coconut-candle.jpg")}" alt="Vela artesanal em casca de coco Ámbar Essence" loading="lazy" decoding="async"></div>
             <div class="special-info"><span>Edição especial · artesanal</span><h4>Vela em casca de coco</h4><p>Recipiente natural, dois pavios e uma presença tropical para composições especiais.</p><a href="${whatsappUrl("a vela em casca de coco")}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
           </article>
         </div>
@@ -339,7 +347,7 @@ app.innerHTML = `
           <div class="story-values"><span>Artesanal</span><span>Vegetal</span><span>Reutilizável</span></div>
         </div>
         <div class="catalog-scene catalog-scene--story">
-          <img src="${assetUrl("products/editorial-event.jpg")}" alt="Exposição artesanal da Ámbar Essence">
+          <img src="${assetUrl("products/editorial-event.jpg")}" alt="Exposição artesanal da Ámbar Essence" loading="lazy" decoding="async">
           <span class="scene-stamp">Feito com carinho<br>na Bahia</span>
         </div>
       </section>
@@ -353,7 +361,7 @@ app.innerHTML = `
           <a class="primary-link kit-button" href="${whatsappUrl("as combinações de kits")}" target="_blank" rel="noreferrer">Comprar <span>${flameIcon}</span></a>
         </div>
         <div class="catalog-scene catalog-scene--kit">
-          <img src="${assetUrl("products/black-vanilla-duo.jpg")}" alt="Kit Black Vanilla com vela aromática e home spray">
+          <img src="${assetUrl("products/black-vanilla-duo.jpg")}" alt="Kit Black Vanilla com vela aromática e home spray" loading="lazy" decoding="async">
         </div>
       </section>
 
@@ -390,7 +398,7 @@ function renderProducts(filter = "todos") {
     <article class="product-card" style="--delay:${index * 70}ms;--product-accent:${product.accent};--image-position:${product.imagePosition}">
       <div class="product-visual">
         <div class="catalog-photo">
-          <img src="${product.image}" alt="Vela aromática ${product.name} da Ámbar Essence" loading="lazy">
+          <img src="${product.image}" alt="Vela aromática ${product.name} da Ámbar Essence" loading="lazy" decoding="async">
         </div>
         <div class="product-topline"><span>0${products.indexOf(product) + 1}</span><span>${product.moodLabel}</span></div>
         <a class="quick-view" href="${whatsappUrl(product.name)}" target="_blank" rel="noreferrer" aria-label="Comprar ${product.name} pelo WhatsApp">${flameIcon}</a>
@@ -408,7 +416,7 @@ function renderProducts(filter = "todos") {
 const sprayGrid = document.querySelector<HTMLDivElement>("#sprayGrid")!;
 sprayGrid.innerHTML = sprays.map((spray, index) => `
   <article class="spray-card" style="--spray-position:${spray.imagePosition};--delay:${index * 55}ms">
-    <div class="spray-photo"><img src="${spray.image}" alt="Home spray ${spray.name} da Ámbar Essence" loading="lazy"></div>
+    <div class="spray-photo"><img src="${spray.image}" alt="Home spray ${spray.name} da Ámbar Essence" loading="lazy" decoding="async"></div>
     <span class="spray-number">${String(index + 1).padStart(2, "0")}</span>
     <div class="spray-info"><h4>${spray.name}</h4><p>${spray.profile}</p><a href="${whatsappUrl(`o home spray ${spray.name}`)}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
   </article>
@@ -423,14 +431,29 @@ document.querySelectorAll<HTMLButtonElement>(".intent").forEach((button) => butt
 
 const candleMount = document.querySelector<HTMLElement>("#candle3d");
 let disposeHero: (() => void) | undefined;
+let heroLoad: Promise<void> | undefined;
 const startHero = () => {
-  if (candleMount && !disposeHero) disposeHero = mountCandle3D(candleMount);
+  if (!candleMount || disposeHero || heroLoad) return;
+  heroLoad = import("./candle3d")
+    .then(({ mountCandle3D }) => {
+      if (candleMount.isConnected && !disposeHero) {
+        disposeHero = mountCandle3D(candleMount);
+      }
+    })
+    .catch((error) => console.error("Não foi possível carregar a vela 3D principal.", error))
+    .finally(() => {
+      heroLoad = undefined;
+    });
 };
 
 const ritual = document.querySelector<HTMLElement>("#ritual")!;
-let ritual3d: ReturnType<typeof mountRitual3D> | undefined;
+const ritual3dMount = document.querySelector<HTMLElement>("#ritual3d");
+const shouldSkipRitual = document.documentElement.classList.contains("skip-ritual");
+let ritual3d: Ritual3DController | undefined;
+let ritualLoad: Promise<void> | undefined;
+
 function enterSite() {
-  if (ritual.classList.contains("lit")) return;
+  if (!ritual.isConnected || ritual.classList.contains("lit")) return;
   const from = ritual3d?.getCandleScreenPosition();
   const target = candleMount?.getBoundingClientRect();
   if (from && target) {
@@ -439,7 +462,11 @@ function enterSite() {
     ritual.style.setProperty("--ritual-slide-scale", window.matchMedia("(max-width: 760px)").matches ? ".82" : ".9");
   }
   ritual.classList.add("lit");
-  localStorage.setItem("ambar-intro-seen", "true");
+  try {
+    localStorage.setItem("ambar-intro-seen", "true");
+  } catch {
+    // O site continua funcional mesmo com armazenamento privado bloqueado.
+  }
   window.setTimeout(() => {
     ritual3d?.dispose();
     startHero();
@@ -447,34 +474,80 @@ function enterSite() {
   window.setTimeout(() => ritual.remove(), 2050);
 }
 
-const ritual3dMount = document.querySelector<HTMLElement>("#ritual3d");
-if (ritual3dMount) ritual3d = mountRitual3D(ritual3dMount, enterSite);
-ritual3dMount?.addEventListener("keydown", (event) => {
-  const keyEvent = event as KeyboardEvent;
-  if (keyEvent.key === "Enter" || keyEvent.key === " ") {
-    keyEvent.preventDefault();
-    ritual3d?.ignite();
+const startRitual = () => {
+  if (shouldSkipRitual || !ritual3dMount || ritual3d || ritualLoad || !ritual.isConnected) {
+    return ritualLoad ?? Promise.resolve();
   }
-});
-document.querySelector("#skipIntro")!.addEventListener("click", enterSite);
-const forceRitual = new URLSearchParams(window.location.search).has("ritual");
-if (localStorage.getItem("ambar-intro-seen") && !forceRitual) {
-  ritual3d?.dispose();
+  ritualLoad = import("./ritual3d")
+    .then(({ mountRitual3D }) => {
+      if (ritual3dMount.isConnected && ritual.isConnected && !ritual.classList.contains("lit")) {
+        ritual3d = mountRitual3D(ritual3dMount, enterSite);
+      }
+    })
+    .catch((error) => console.error("Não foi possível carregar o ritual 3D.", error))
+    .finally(() => {
+      ritualLoad = undefined;
+    });
+  return ritualLoad;
+};
+
+if (shouldSkipRitual) {
   ritual.remove();
   startHero();
+} else {
+  void startRitual();
+  ritual3dMount?.addEventListener("keydown", (event) => {
+    const keyEvent = event as KeyboardEvent;
+    if (keyEvent.key === "Enter" || keyEvent.key === " ") {
+      keyEvent.preventDefault();
+      void startRitual().then(() => ritual3d?.ignite());
+    }
+  });
+  document.querySelector("#skipIntro")?.addEventListener("click", enterSite);
 }
 
 const burnSlider = document.querySelector<HTMLInputElement>("#burnSlider")!;
 const burnCandleMount = document.querySelector<HTMLElement>("#burnCandle3d")!;
 const burnSmoke = document.querySelector<HTMLElement>("#burnSmoke")!;
-const burnCandle3d = mountBurnCandle3D(burnCandleMount);
+let burnCandle3d: BurnCandleController | undefined;
+let burnLoad: Promise<void> | undefined;
+let burnProgress = 0;
 let burnWasExtinguished = false;
+
+const startBurnCandle = () => {
+  if (burnCandle3d || burnLoad) return burnLoad ?? Promise.resolve();
+  burnLoad = import("./burnCandle3d")
+    .then(({ mountBurnCandle3D }) => {
+      if (!burnCandleMount.isConnected) return;
+      burnCandle3d = mountBurnCandle3D(burnCandleMount);
+      burnCandle3d.setProgress(burnProgress);
+    })
+    .catch((error) => console.error("Não foi possível carregar a demonstração 3D.", error))
+    .finally(() => {
+      burnLoad = undefined;
+    });
+  return burnLoad;
+};
+
+if ("IntersectionObserver" in window) {
+  const burnObserver = new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting) return;
+    burnObserver.disconnect();
+    void startBurnCandle();
+  }, { rootMargin: "450px 0px" });
+  burnObserver.observe(burnCandleMount);
+} else {
+  void startBurnCandle();
+}
+burnSlider.addEventListener("pointerdown", () => void startBurnCandle(), { once: true });
+burnSlider.addEventListener("keydown", () => void startBurnCandle(), { once: true });
+
 const updateBurnDemo = () => {
   const value = Number(burnSlider.value);
-  const progress = (value - Number(burnSlider.min)) / (Number(burnSlider.max) - Number(burnSlider.min));
-  const extinguished = progress >= .995;
+  burnProgress = (value - Number(burnSlider.min)) / (Number(burnSlider.max) - Number(burnSlider.min));
+  const extinguished = burnProgress >= .995;
   document.querySelector("#burnValue")!.textContent = value < 60 ? `${value} min` : `${value / 60} h`;
-  burnCandle3d.setProgress(progress);
+  burnCandle3d?.setProgress(burnProgress);
   if (extinguished && !burnWasExtinguished) {
     burnSmoke.classList.remove("is-active");
     void burnSmoke.offsetWidth;

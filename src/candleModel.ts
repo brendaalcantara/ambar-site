@@ -73,12 +73,14 @@ function makeWoodTexture(): THREE.CanvasTexture {
   return texture;
 }
 
-function makeLabelTexture(): THREE.CanvasTexture {
+function makeLabelTexture(quality: CandleQuality): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
-  canvas.width = 1400;
-  canvas.height = 800;
+  const textureScale = quality === "mobile" ? .55 : .75;
+  canvas.width = Math.round(1400 * textureScale);
+  canvas.height = Math.round(800 * textureScale);
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D indisponível");
+  ctx.scale(textureScale, textureScale);
 
   const backdrop = ctx.createLinearGradient(0, 0, 1400, 800);
   backdrop.addColorStop(0, "#e5c5b2");
@@ -188,7 +190,7 @@ function makeLabelTexture(): THREE.CanvasTexture {
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.anisotropy = 8;
+  texture.anisotropy = quality === "mobile" ? 4 : 6;
   return texture;
 }
 
@@ -298,7 +300,7 @@ export function createFlameVfx(): {
     `,
   });
   const group = new THREE.Group();
-  const planeGeometry = new THREE.PlaneGeometry(.5, .86, 18, 28);
+  const planeGeometry = new THREE.PlaneGeometry(.5, .86, 10, 18);
   planeGeometry.translate(0, .36, 0);
   const front = new THREE.Mesh(planeGeometry, material);
   const cross = new THREE.Mesh(planeGeometry, material);
@@ -357,7 +359,7 @@ function makeSmoke(quality: CandleQuality): {
   const texture = new THREE.CanvasTexture(textureCanvas);
   texture.colorSpace = THREE.SRGBColorSpace;
 
-  const count = quality === "mobile" ? 13 : 22;
+  const count = quality === "mobile" ? 10 : 16;
   const random = seededNoise(2718);
   const group = new THREE.Group();
   const particles: Array<{
@@ -459,10 +461,10 @@ function makeLid(quality: CandleQuality): THREE.Group {
 
 export function createCandleModel(options: { lit: boolean; quality: CandleQuality; includeLid?: boolean }): CandleModel {
   const { lit, quality, includeLid = true } = options;
-  const segments = quality === "mobile" ? 48 : 88;
+  const segments = quality === "mobile" ? 36 : 64;
   const group = new THREE.Group();
   const resources: Array<THREE.Texture | THREE.Material | THREE.BufferGeometry> = [];
-  const waxBump = makeNoiseTexture(quality === "mobile" ? 128 : 256, 41, 36);
+  const waxBump = makeNoiseTexture(quality === "mobile" ? 96 : 192, 41, 36);
   resources.push(waxBump);
 
   const glassMaterial = new THREE.MeshPhysicalMaterial({
@@ -514,19 +516,19 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
   resources.push(meltPool.geometry, meltMaterial);
 
   const wickMaterial = new THREE.MeshStandardMaterial({ color: 0x38251d, roughness: .96 });
-  const wick = new THREE.Mesh(new THREE.CylinderGeometry(.014, .017, .205, 12, 3), wickMaterial);
+  const wick = new THREE.Mesh(new THREE.CylinderGeometry(.014, .017, .205, 8, 2), wickMaterial);
   wick.position.y = 2.005;
   wick.rotation.z = -.045;
   group.add(wick);
   resources.push(wick.geometry, wickMaterial);
   const charMaterial = new THREE.MeshStandardMaterial({ color: 0x181210, roughness: .96, emissive: 0x5c1905, emissiveIntensity: lit ? .32 : 0 });
-  const char = new THREE.Mesh(new THREE.CylinderGeometry(.017, .014, .055, 12, 2), charMaterial);
+  const char = new THREE.Mesh(new THREE.CylinderGeometry(.017, .014, .055, 8, 1), charMaterial);
   char.position.set(-.004, 2.126, 0);
   char.rotation.z = -.045;
   group.add(char);
   resources.push(char.geometry, charMaterial);
 
-  const labelTexture = makeLabelTexture();
+  const labelTexture = makeLabelTexture(quality);
   const labelMaterial = new THREE.MeshStandardMaterial({
     map: labelTexture,
     roughness: .96,
@@ -540,7 +542,7 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
     depthWrite: false,
   });
   const labelRadius = 1.074;
-  const labelGeometry = new THREE.PlaneGeometry(1.46, .98, 48, 1);
+  const labelGeometry = new THREE.PlaneGeometry(1.46, .98, quality === "mobile" ? 24 : 32, 1);
   const labelPositions = labelGeometry.getAttribute("position");
   for (let index = 0; index < labelPositions.count; index += 1) {
     const x = labelPositions.getX(index);

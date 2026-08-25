@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { createCandleModel, type CandleQuality } from "./candleModel";
 
 function makeGroundShadow(): THREE.CanvasTexture {
@@ -27,7 +26,7 @@ export function mountBurnCandle3D(container: HTMLElement): { setProgress: (progr
   camera.lookAt(0, 1.02, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1.2 : 1.55));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1.1 : 1.35));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = .9;
@@ -41,15 +40,13 @@ export function mountBurnCandle3D(container: HTMLElement): { setProgress: (progr
   scene.environmentIntensity = .72;
   room.dispose();
   pmrem.dispose();
-  RectAreaLightUniformsLib.init();
 
   scene.add(new THREE.HemisphereLight(0xfff4dd, 0x76543f, .92));
   const key = new THREE.DirectionalLight(0xffdeb0, 1.75);
   key.position.set(3.4, 5.2, 4.1);
   scene.add(key);
-  const softbox = new THREE.RectAreaLight(0xffead4, quality === "mobile" ? 1.7 : 2.65, 2.2, 3.7);
+  const softbox = new THREE.DirectionalLight(0xffead4, quality === "mobile" ? .65 : .95);
   softbox.position.set(2.7, 3.2, 3.2);
-  softbox.lookAt(0, 1.02, 0);
   scene.add(softbox);
 
   const candle = createCandleModel({ lit: true, quality, includeLid: false });

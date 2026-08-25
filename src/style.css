@@ -66,6 +66,7 @@ a { color: inherit; }
 }
 
 /* Entrance ritual */
+.skip-ritual .ritual { display: none; }
 .ritual {
   position: fixed;
   inset: 0;

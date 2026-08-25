@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
-import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { createCandleModel, createFlameVfx, type CandleQuality } from "./candleModel";
 
 type MatchModel = {
@@ -169,7 +168,7 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
   camera.position.set(0, 2.28, quality === "mobile" ? 6.4 : 6.8);
   camera.lookAt(0, 1.18, 0);
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1.2 : 1.6));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1.1 : 1.45));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.0;
@@ -185,7 +184,6 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
   scene.environmentIntensity = .28;
   room.dispose();
   pmrem.dispose();
-  RectAreaLightUniformsLib.init();
 
   scene.add(new THREE.HemisphereLight(0x5e4939, 0x100d0b, .48));
   const rim = new THREE.DirectionalLight(0xc08b54, 1.18);
@@ -196,9 +194,8 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
   rim.shadow.bias = -.00035;
   rim.shadow.normalBias = .025;
   scene.add(rim);
-  const softbox = new THREE.RectAreaLight(0xffc88c, quality === "mobile" ? 1.7 : 2.8, 1.4, 3.2);
+  const softbox = new THREE.DirectionalLight(0xffc88c, quality === "mobile" ? .6 : .9);
   softbox.position.set(2.8, 3.0, 3.4);
-  softbox.lookAt(0, 1.05, 0);
   scene.add(softbox);
 
   const candle = createCandleModel({ lit: false, quality, includeLid: false });

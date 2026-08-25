@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 import { createCandleModel, type CandleQuality } from "./candleModel";
 
 function makeCircularShadowTexture(): THREE.CanvasTexture {
@@ -35,7 +34,7 @@ export function mountCandle3D(container: HTMLElement): () => void {
   camera.lookAt(0, 1.02, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1.35 : 1.8));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1.2 : 1.6));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = .88;
@@ -51,7 +50,6 @@ export function mountCandle3D(container: HTMLElement): () => void {
   scene.environmentIntensity = .82;
   room.dispose();
   pmrem.dispose();
-  RectAreaLightUniformsLib.init();
 
   scene.add(new THREE.HemisphereLight(0xfff5df, 0x71513c, .9));
   const key = new THREE.DirectionalLight(0xffe3b7, 2.05);
@@ -62,13 +60,11 @@ export function mountCandle3D(container: HTMLElement): () => void {
   const rim = new THREE.DirectionalLight(0xabc29b, .72);
   rim.position.set(-4, 2.5, -3);
   scene.add(rim);
-  const softbox = new THREE.RectAreaLight(0xffead3, quality === "mobile" ? 2.0 : 3.1, 2.6, 4.2);
+  const softbox = new THREE.DirectionalLight(0xffead3, quality === "mobile" ? .55 : .85);
   softbox.position.set(2.8, 3.25, 3.1);
-  softbox.lookAt(0, 1.05, 0);
   scene.add(softbox);
-  const edgeStrip = new THREE.RectAreaLight(0xe9f1e2, quality === "mobile" ? 1.3 : 2.2, .45, 3.3);
+  const edgeStrip = new THREE.DirectionalLight(0xe9f1e2, quality === "mobile" ? .35 : .5);
   edgeStrip.position.set(-2.6, 2.3, 1.1);
-  edgeStrip.lookAt(0, 1.0, 0);
   scene.add(edgeStrip);
 
   const candle = createCandleModel({ lit: true, quality, includeLid: false });

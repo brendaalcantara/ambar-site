@@ -6,6 +6,22 @@
     <meta name="theme-color" content="#2c2c2c" />
     <meta name="description" content="Ámbar Essence — aromas que transformam." />
     <meta name="application-name" content="Ámbar Essence" />
+    <script>
+      (() => {
+        try {
+          const url = new URL(window.location.href);
+          const forceRitual = url.searchParams.has("ritual");
+          if (forceRitual) {
+            url.searchParams.delete("ritual");
+            history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+          } else if (localStorage.getItem("ambar-intro-seen")) {
+            document.documentElement.classList.add("skip-ritual");
+          }
+        } catch {
+          // A introdução continua disponível quando o armazenamento é bloqueado.
+        }
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <title>Ámbar Essence</title>
   </head>
