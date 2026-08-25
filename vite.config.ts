@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  base: mode === "development" ? "/" : "/ambar-site/",
   build: {
     rollupOptions: {
       output: {
@@ -10,4 +11,4 @@ export default defineConfig({
       }
     }
   }
-});
+}));

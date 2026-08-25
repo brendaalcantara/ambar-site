@@ -22,6 +22,9 @@ type Spray = {
   imagePosition: string;
 };
 
+const assetUrl = (path: string) =>
+  `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
+
 const WHATSAPP_NUMBER = "5573999303454";
 const whatsappUrl = (product = "os produtos da Ámbar Essence") =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Olá! Vim pelo catálogo da Ámbar Essence e gostaria de saber mais sobre ${product}.`)}`;
@@ -33,7 +36,7 @@ const products: Product[] = [
     mood: "acolhimento",
     moodLabel: "Acolhimento",
     notes: "Baunilha · Madeiras nobres · Âmbar",
-    image: "/products/black-vanilla-candle.jpg",
+    image: assetUrl("products/black-vanilla-candle.jpg"),
     imagePosition: "center 61%",
     accent: "#A65D45",
     description: "Marcante, quente e sofisticada. Um convite ao descanso e ao conforto.",
@@ -44,7 +47,7 @@ const products: Product[] = [
     mood: "leveza",
     moodLabel: "Leveza",
     notes: "Floral limpo · Musk · Folhas suaves",
-    image: "/products/cha-branco-spray.jpg",
+    image: assetUrl("products/cha-branco-spray.jpg"),
     imagePosition: "center 55%",
     accent: "#C9A96A",
     description: "Delicada e refinada, cria uma atmosfera tranquila e elegante.",
@@ -55,7 +58,7 @@ const products: Product[] = [
     mood: "acolhimento",
     moodLabel: "Doçura",
     notes: "Cereja · Avelã · Notas cremosas",
-    image: "/products/cereja-avela-candle.jpg",
+    image: assetUrl("products/cereja-avela-candle.jpg"),
     imagePosition: "center 64%",
     accent: "#A65D45",
     description: "Frutada e cremosa, transforma o ambiente em uma memória acolhedora.",
@@ -66,7 +69,7 @@ const products: Product[] = [
     mood: "energia",
     moodLabel: "Energia",
     notes: "Cítrico · Folhas frescas · Verbena",
-    image: "/products/capim-limao-candle.jpg",
+    image: assetUrl("products/capim-limao-candle.jpg"),
     imagePosition: "center 62%",
     accent: "#8FA06E",
     description: "Refrescante e revigorante, ideal para renovar as energias da casa.",
@@ -77,7 +80,7 @@ const products: Product[] = [
     mood: "natureza",
     moodLabel: "Equilíbrio",
     notes: "Notas verdes · Madeira clara · Orvalho",
-    image: "/products/bambu-duo.jpg",
+    image: assetUrl("products/bambu-duo.jpg"),
     imagePosition: "center 58%",
     accent: "#A3B18A",
     description: "Leve e contemporânea, equilibra frescor natural e sofisticação.",
@@ -88,7 +91,7 @@ const products: Product[] = [
     mood: "natureza",
     moodLabel: "Natureza",
     notes: "Verde · Cítrico · Amadeirado",
-    image: "/products/cascas-folhas-duo.jpg",
+    image: assetUrl("products/cascas-folhas-duo.jpg"),
     imagePosition: "center 59%",
     accent: "#8A5A3B",
     description: "Verde e amadeirada, traz para dentro de casa a sensação de natureza viva.",
@@ -99,7 +102,7 @@ const products: Product[] = [
     mood: "leveza",
     moodLabel: "Serenidade",
     notes: "Lavanda · Ervas · Flores brancas",
-    image: "/products/lavanda-duo.jpg",
+    image: assetUrl("products/lavanda-duo.jpg"),
     imagePosition: "center 60%",
     accent: "#8A5A3B",
     description: "Floral e serena, desacelera o ambiente e transforma a rotina em ritual.",
@@ -108,18 +111,18 @@ const products: Product[] = [
 ];
 
 const sprays: Spray[] = [
-  { name: "Bambu", profile: "Sofisticado · Verde · Equilibrado", image: "/products/bambu-spray.jpg", imagePosition: "center 58%" },
-  { name: "Capim-Limão", profile: "Cítrico · Verde · Refrescante", image: "/products/capim-limao-spray.jpg", imagePosition: "center 56%" },
-  { name: "Cascas e Folhas", profile: "Verde · Cítrico · Amadeirado", image: "/products/cascas-folhas-spray.jpg", imagePosition: "center 55%" },
-  { name: "Cereja e Avelã", profile: "Frutal · Adocicado · Aveludado", image: "/products/cereja-avela-spray.jpg", imagePosition: "center 54%" },
-  { name: "Chá Branco", profile: "Floral · Cítrico · Musk", image: "/products/cha-branco-spray.jpg", imagePosition: "center 55%" },
-  { name: "Lavanda Francesa", profile: "Floral · Aromática · Relaxante", image: "/products/lavanda-spray.jpg", imagePosition: "center 56%" },
-  { name: "Vanilla", profile: "Envolvente · Âmbar · Notas quentes", image: "/products/vanilla-spray.jpg", imagePosition: "center 55%" },
+  { name: "Bambu", profile: "Sofisticado · Verde · Equilibrado", image: assetUrl("products/bambu-spray.jpg"), imagePosition: "center 58%" },
+  { name: "Capim-Limão", profile: "Cítrico · Verde · Refrescante", image: assetUrl("products/capim-limao-spray.jpg"), imagePosition: "center 56%" },
+  { name: "Cascas e Folhas", profile: "Verde · Cítrico · Amadeirado", image: assetUrl("products/cascas-folhas-spray.jpg"), imagePosition: "center 55%" },
+  { name: "Cereja e Avelã", profile: "Frutal · Adocicado · Aveludado", image: assetUrl("products/cereja-avela-spray.jpg"), imagePosition: "center 54%" },
+  { name: "Chá Branco", profile: "Floral · Cítrico · Musk", image: assetUrl("products/cha-branco-spray.jpg"), imagePosition: "center 55%" },
+  { name: "Lavanda Francesa", profile: "Floral · Aromática · Relaxante", image: assetUrl("products/lavanda-spray.jpg"), imagePosition: "center 56%" },
+  { name: "Vanilla", profile: "Envolvente · Âmbar · Notas quentes", image: assetUrl("products/vanilla-spray.jpg"), imagePosition: "center 55%" },
 ];
 
 const brandLogo = `
   <span class="brand-lockup" aria-hidden="true">
-    <img src="/brand/ambar-brandboard.jpg" alt="">
+    <img src="${assetUrl("brand/ambar-brandboard.jpg")}" alt="">
   </span>
 `;
 
@@ -267,7 +270,7 @@ app.innerHTML = `
       <section class="home-spray-section" id="home-sprays">
         <div class="home-spray">
           <div class="catalog-scene catalog-scene--spray">
-            <img src="/products/collection-detail.jpg" alt="Coleção de velas e home sprays Ámbar Essence">
+            <img src="${assetUrl("products/collection-detail.jpg")}" alt="Coleção de velas e home sprays Ámbar Essence">
             <span class="scene-caption">7 aromas<br>para a casa</span>
           </div>
           <div class="home-spray-copy">
@@ -300,11 +303,11 @@ app.innerHTML = `
         </div>
         <div class="special-grid">
           <article class="special-card">
-            <div class="special-photo"><img src="/products/moscow-mule.jpg" alt="Vela Moscow Mule Ámbar Essence" loading="lazy"></div>
+            <div class="special-photo"><img src="${assetUrl("products/moscow-mule.jpg")}" alt="Vela Moscow Mule Ámbar Essence" loading="lazy"></div>
             <div class="special-info"><span>Edição especial · 150g</span><h4>Moscow Mule</h4><p>Limão siciliano e baunilha em cera de coco. Aproximadamente 30 horas de queima.</p><a href="${whatsappUrl("a vela Moscow Mule")}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
           </article>
           <article class="special-card special-card--reverse">
-            <div class="special-photo"><img src="/products/coconut-candle.jpg" alt="Vela artesanal em casca de coco Ámbar Essence" loading="lazy"></div>
+            <div class="special-photo"><img src="${assetUrl("products/coconut-candle.jpg")}" alt="Vela artesanal em casca de coco Ámbar Essence" loading="lazy"></div>
             <div class="special-info"><span>Edição especial · artesanal</span><h4>Vela em casca de coco</h4><p>Recipiente natural, dois pavios e uma presença tropical para composições especiais.</p><a href="${whatsappUrl("a vela em casca de coco")}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
           </article>
         </div>
@@ -336,7 +339,7 @@ app.innerHTML = `
           <div class="story-values"><span>Artesanal</span><span>Vegetal</span><span>Reutilizável</span></div>
         </div>
         <div class="catalog-scene catalog-scene--story">
-          <img src="/products/editorial-event.jpg" alt="Exposição artesanal da Ámbar Essence">
+          <img src="${assetUrl("products/editorial-event.jpg")}" alt="Exposição artesanal da Ámbar Essence">
           <span class="scene-stamp">Feito com carinho<br>na Bahia</span>
         </div>
       </section>
@@ -350,7 +353,7 @@ app.innerHTML = `
           <a class="primary-link kit-button" href="${whatsappUrl("as combinações de kits")}" target="_blank" rel="noreferrer">Comprar <span>${flameIcon}</span></a>
         </div>
         <div class="catalog-scene catalog-scene--kit">
-          <img src="/products/black-vanilla-duo.jpg" alt="Kit Black Vanilla com vela aromática e home spray">
+          <img src="${assetUrl("products/black-vanilla-duo.jpg")}" alt="Kit Black Vanilla com vela aromática e home spray">
         </div>
       </section>
 
