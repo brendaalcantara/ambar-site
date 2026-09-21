@@ -4,25 +4,6 @@ export type CandleFallbackOptions = {
   onActivate?: () => void;
 };
 
-type DeviceHints = Navigator & {
-  deviceMemory?: number;
-  connection?: { saveData?: boolean };
-};
-
-/**
- * Keep WebGL for capable phones, but avoid starting it on the small class of
- * devices where a full-screen transparent canvas is likely to jank or lose
- * its context. The CSS candle is still branded and interactive.
- */
-export function shouldUseCandleFallback(): boolean {
-  if (!window.matchMedia("(max-width: 760px)").matches) return false;
-  const device = navigator as DeviceHints;
-  const lowMemory = typeof device.deviceMemory === "number" && device.deviceMemory <= 2;
-  const lowCpu = typeof device.hardwareConcurrency === "number" && device.hardwareConcurrency <= 2;
-  const saveData = device.connection?.saveData === true;
-  return lowMemory || lowCpu || saveData;
-}
-
 export function showCandleFallback(
   container: HTMLElement,
   options: CandleFallbackOptions = {},

@@ -1,5 +1,5 @@
 import "./style.css";
-import { showCandleFallback, shouldUseCandleFallback } from "./candleFallback";
+import { showCandleFallback } from "./candleFallback";
 
 type Product = {
   name: string;
@@ -431,15 +431,10 @@ document.querySelectorAll<HTMLButtonElement>(".intent").forEach((button) => butt
 }));
 
 const candleMount = document.querySelector<HTMLElement>("#candle3d");
-const preferCandleFallback = shouldUseCandleFallback();
 let disposeHero: (() => void) | undefined;
 let heroLoad: Promise<void> | undefined;
 const startHero = () => {
   if (!candleMount || disposeHero || heroLoad) return;
-  if (preferCandleFallback) {
-    showCandleFallback(candleMount, { lit: true, message: "Visualização leve da vela" });
-    return;
-  }
   heroLoad = import("./candle3d")
     .then(({ mountCandle3D }) => {
       if (candleMount.isConnected && !disposeHero) {
@@ -493,13 +488,6 @@ const startRitual = () => {
   if (shouldSkipRitual || !ritual3dMount || ritual3d || ritualLoad || !ritual.isConnected) {
     return ritualLoad ?? Promise.resolve();
   }
-  if (preferCandleFallback) {
-    showCandleFallback(ritual3dMount, {
-      message: "Toque na vela para continuar",
-      onActivate: enterSite,
-    });
-    return Promise.resolve();
-  }
   ritualLoad = import("./ritual3d")
     .then(({ mountRitual3D }) => {
       if (ritual3dMount.isConnected && ritual.isConnected && !ritual.classList.contains("lit")) {
@@ -550,20 +538,6 @@ let burnWasExtinguished = false;
 
 const startBurnCandle = () => {
   if (burnCandle3d || burnLoad) return burnLoad ?? Promise.resolve();
-  if (preferCandleFallback) {
-    showCandleFallback(burnCandleMount, { lit: true, message: "Visualização leve da vela" });
-    burnCandle3d = {
-      setProgress: (progress) => {
-        const fallback = burnCandleMount.querySelector<HTMLElement>(".webgl-candle-fallback");
-        if (!fallback) return;
-        fallback.style.setProperty("--burn-progress", String(progress));
-        fallback.classList.toggle("is-extinguished", progress >= .995);
-      },
-      dispose: () => burnCandleMount.querySelector(".webgl-candle-fallback")?.remove(),
-    };
-    burnCandle3d.setProgress(burnProgress);
-    return Promise.resolve();
-  }
   burnLoad = import("./burnCandle3d")
     .then(({ mountBurnCandle3D }) => {
       if (!burnCandleMount.isConnected) return;
