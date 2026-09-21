@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { createCandleModel, type CandleQuality } from "./candleModel";
 import { bindWebGLFallback } from "./candleFallback";
 
@@ -26,8 +25,9 @@ function chooseQuality(): CandleQuality {
   return window.matchMedia("(max-width: 760px)").matches ? "mobile" : "desktop";
 }
 
-export function mountCandle3D(container: HTMLElement): () => void {
+export async function mountCandle3D(container: HTMLElement): Promise<() => void> {
   const quality = chooseQuality();
+  const isMobile = quality === "mobile";
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(36, 1, .1, 40);
@@ -40,9 +40,15 @@ export function mountCandle3D(container: HTMLElement): () => void {
     depth: true,
     stencil: false,
     precision: quality === "mobile" ? "mediump" : "highp",
-    powerPreference: quality === "mobile" ? "default" : "high-performance",
+    powerPreference: isMobile ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1 : 1.6));
+  // A sub-1 pixel ratio is intentional here: mobile screens already have
+  // dense physical pixels, while the candle's soft materials hide the small
+  // reduction in internal resolution.
+  // Keep the mobile image at the same visual density as the earlier version;
+  // the performance work happens in loading and scheduling, not by blurring
+  // the candle.
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 1.6));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = .88;
@@ -57,6 +63,9 @@ export function mountCandle3D(container: HTMLElement): () => void {
 
   let environment: THREE.WebGLRenderTarget | undefined;
   if (quality === "desktop") {
+    // The environment is only needed for the desktop physical-glass path.
+    // Keeping it dynamic prevents mobile devices from downloading it.
+    const { RoomEnvironment } = await import("three/examples/jsm/environments/RoomEnvironment.js");
     const pmrem = new THREE.PMREMGenerator(renderer);
     const room = new RoomEnvironment();
     environment = pmrem.fromScene(room, .035);
@@ -69,16 +78,16 @@ export function mountCandle3D(container: HTMLElement): () => void {
   scene.add(new THREE.HemisphereLight(0xfff5df, 0x71513c, .9));
   const key = new THREE.DirectionalLight(0xffe3b7, 2.05);
   key.position.set(3.2, 5.5, 4.2);
-  key.castShadow = quality === "desktop";
+  key.castShadow = !isMobile;
   key.shadow.mapSize.set(1024, 1024);
   scene.add(key);
   const rim = new THREE.DirectionalLight(0xabc29b, .72);
   rim.position.set(-4, 2.5, -3);
   scene.add(rim);
-  const softbox = new THREE.DirectionalLight(0xffead3, quality === "mobile" ? .55 : .85);
+  const softbox = new THREE.DirectionalLight(0xffead3, isMobile ? .55 : .85);
   softbox.position.set(2.8, 3.25, 3.1);
   scene.add(softbox);
-  const edgeStrip = new THREE.DirectionalLight(0xe9f1e2, quality === "mobile" ? .35 : .5);
+  const edgeStrip = new THREE.DirectionalLight(0xe9f1e2, isMobile ? .35 : .5);
   edgeStrip.position.set(-2.6, 2.3, 1.1);
   scene.add(edgeStrip);
 
@@ -129,7 +138,7 @@ export function mountCandle3D(container: HTMLElement): () => void {
 
   renderer.setAnimationLoop((time) => {
     if (disposed || !visible) return;
-    if (quality === "mobile" && time - lastFrame < 1000 / 30) return;
+    if (isMobile && time - lastFrame < 1000 / 30) return;
     lastFrame = time;
     const elapsed = clock.getElapsedTime();
     controls.autoRotate = !reducedMotionQuery.matches;

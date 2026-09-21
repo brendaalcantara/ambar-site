@@ -45,6 +45,30 @@ function makeNoiseTexture(size: number, seed: number, contrast = 42): THREE.Canv
   return texture;
 }
 
+type SharedTextureEntry = { texture: THREE.Texture; refs: number };
+const sharedTextures = new Map<string, SharedTextureEntry>();
+
+function acquireSharedTexture(key: string, create: () => THREE.Texture): { texture: THREE.Texture; release: () => void } {
+  let entry = sharedTextures.get(key);
+  if (!entry) {
+    entry = { texture: create(), refs: 0 };
+    sharedTextures.set(key, entry);
+  }
+  entry.refs += 1;
+  let released = false;
+  return {
+    texture: entry.texture,
+    release: () => {
+      if (released) return;
+      released = true;
+      entry!.refs -= 1;
+      if (entry!.refs > 0) return;
+      entry!.texture.dispose();
+      sharedTextures.delete(key);
+    },
+  };
+}
+
 function makeWoodTexture(): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = 768;
@@ -469,8 +493,13 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
   const segments = quality === "mobile" ? 36 : 64;
   const group = new THREE.Group();
   const resources: Array<THREE.Texture | THREE.Material | THREE.BufferGeometry> = [];
-  const waxBump = makeNoiseTexture(quality === "mobile" ? 96 : 192, 41, 36);
-  resources.push(waxBump);
+  const waxBumpRef = acquireSharedTexture(
+    `wax-bump-${quality}`,
+    () => makeNoiseTexture(quality === "mobile" ? 96 : 192, 41, 36),
+  );
+  const waxBump = waxBumpRef.texture;
+  const labelTextureRef = acquireSharedTexture(`label-${quality}`, () => makeLabelTexture(quality));
+  const labelTexture = labelTextureRef.texture;
 
   const glassMaterial = quality === "mobile"
     ? new THREE.MeshStandardMaterial({
@@ -552,7 +581,6 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
   group.add(char);
   resources.push(char.geometry, charMaterial);
 
-  const labelTexture = makeLabelTexture(quality);
   const labelMaterial = new THREE.MeshStandardMaterial({
     map: labelTexture,
     roughness: .96,
@@ -579,7 +607,7 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
   label.position.set(0, 1.04, labelRadius + .014);
   label.renderOrder = 20;
   group.add(label);
-  resources.push(labelTexture, labelMaterial, labelGeometry);
+  resources.push(labelMaterial, labelGeometry);
 
   if (includeLid) {
     const lid = makeLid(quality);
@@ -637,6 +665,7 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
     dispose: () => {
       smoke.dispose();
       const seen = new Set<unknown>();
+      const shared = new Set<THREE.Texture>([waxBump, labelTexture]);
       group.traverse((object) => {
         if (!(object instanceof THREE.Mesh) && !(object instanceof THREE.Points)) return;
         if (!seen.has(object.geometry)) {
@@ -646,7 +675,7 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
         const materials = Array.isArray(object.material) ? object.material : [object.material];
         materials.forEach((material) => {
           Object.values(material).forEach((value) => {
-            if (value instanceof THREE.Texture && !seen.has(value)) {
+            if (value instanceof THREE.Texture && !shared.has(value) && !seen.has(value)) {
               seen.add(value);
               value.dispose();
             }
@@ -662,6 +691,8 @@ export function createCandleModel(options: { lit: boolean; quality: CandleQualit
         seen.add(resource);
         resource.dispose();
       });
+      waxBumpRef.release();
+      labelTextureRef.release();
     },
   };
 }

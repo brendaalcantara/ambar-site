@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { createCandleModel, createFlameVfx, type CandleQuality } from "./candleModel";
 import { bindWebGLFallback } from "./candleFallback";
@@ -161,8 +160,9 @@ function createEmbers(quality: CandleQuality): {
   };
 }
 
-export function mountRitual3D(container: HTMLElement, onComplete: () => void): { ignite: () => void; getCandleScreenPosition: () => { x: number; y: number }; dispose: () => void } {
+export async function mountRitual3D(container: HTMLElement, onComplete: () => void): Promise<{ ignite: () => void; getCandleScreenPosition: () => { x: number; y: number }; dispose: () => void }> {
   const quality: CandleQuality = window.matchMedia("(max-width: 760px)").matches ? "mobile" : "desktop";
+  const isMobile = quality === "mobile";
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(34, 1, .1, 40);
@@ -174,9 +174,9 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
     depth: true,
     stencil: false,
     precision: quality === "mobile" ? "mediump" : "highp",
-    powerPreference: quality === "mobile" ? "default" : "high-performance",
+    powerPreference: isMobile ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1 : 1.45));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 1.45));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.0;
@@ -190,6 +190,7 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
 
   let environment: THREE.WebGLRenderTarget | undefined;
   if (quality === "desktop") {
+    const { RoomEnvironment } = await import("three/examples/jsm/environments/RoomEnvironment.js");
     const pmrem = new THREE.PMREMGenerator(renderer);
     const room = new RoomEnvironment();
     environment = pmrem.fromScene(room, .035);
@@ -202,13 +203,13 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
   scene.add(new THREE.HemisphereLight(0x5e4939, 0x100d0b, .48));
   const rim = new THREE.DirectionalLight(0xc08b54, 1.18);
   rim.position.set(-3.5, 4.5, 4);
-  rim.castShadow = quality === "desktop";
+  rim.castShadow = !isMobile;
   rim.shadow.mapSize.set(768, 768);
   rim.shadow.radius = 5;
   rim.shadow.bias = -.00035;
   rim.shadow.normalBias = .025;
   scene.add(rim);
-  const softbox = new THREE.DirectionalLight(0xffc88c, quality === "mobile" ? .6 : .9);
+  const softbox = new THREE.DirectionalLight(0xffc88c, isMobile ? .6 : .9);
   softbox.position.set(2.8, 3.0, 3.4);
   scene.add(softbox);
 
@@ -453,7 +454,7 @@ export function mountRitual3D(container: HTMLElement, onComplete: () => void): {
 
   renderer.setAnimationLoop((time) => {
     if (disposed || !pageVisible) return;
-    if (quality === "mobile" && time - lastFrame < 1000 / 40) return;
+    if (isMobile && time - lastFrame < 1000 / 40) return;
     lastFrame = time;
     const elapsed = clock.getElapsedTime();
     candle.update(elapsed, reducedMotionQuery.matches);

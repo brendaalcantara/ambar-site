@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { createCandleModel, type CandleQuality } from "./candleModel";
 import { bindWebGLFallback } from "./candleFallback";
 
@@ -18,8 +17,9 @@ function makeGroundShadow(): THREE.CanvasTexture {
   return new THREE.CanvasTexture(canvas);
 }
 
-export function mountBurnCandle3D(container: HTMLElement): { setProgress: (progress: number) => void; dispose: () => void } {
+export async function mountBurnCandle3D(container: HTMLElement): Promise<{ setProgress: (progress: number) => void; dispose: () => void }> {
   const quality: CandleQuality = window.matchMedia("(max-width: 760px)").matches ? "mobile" : "desktop";
+  const isMobile = quality === "mobile";
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(35, 1, .1, 35);
@@ -32,9 +32,9 @@ export function mountBurnCandle3D(container: HTMLElement): { setProgress: (progr
     depth: true,
     stencil: false,
     precision: quality === "mobile" ? "mediump" : "highp",
-    powerPreference: quality === "mobile" ? "default" : "high-performance",
+    powerPreference: isMobile ? "low-power" : "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === "mobile" ? 1 : 1.35));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 1.35));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = .9;
@@ -47,6 +47,7 @@ export function mountBurnCandle3D(container: HTMLElement): { setProgress: (progr
 
   let environment: THREE.WebGLRenderTarget | undefined;
   if (quality === "desktop") {
+    const { RoomEnvironment } = await import("three/examples/jsm/environments/RoomEnvironment.js");
     const pmrem = new THREE.PMREMGenerator(renderer);
     const room = new RoomEnvironment();
     environment = pmrem.fromScene(room, .035);
@@ -60,7 +61,7 @@ export function mountBurnCandle3D(container: HTMLElement): { setProgress: (progr
   const key = new THREE.DirectionalLight(0xffdeb0, 1.75);
   key.position.set(3.4, 5.2, 4.1);
   scene.add(key);
-  const softbox = new THREE.DirectionalLight(0xffead4, quality === "mobile" ? .65 : .95);
+  const softbox = new THREE.DirectionalLight(0xffead4, isMobile ? .65 : .95);
   softbox.position.set(2.7, 3.2, 3.2);
   scene.add(softbox);
 
@@ -99,7 +100,7 @@ export function mountBurnCandle3D(container: HTMLElement): { setProgress: (progr
 
   renderer.setAnimationLoop((time) => {
     if (disposed || !visible) return;
-    if (quality === "mobile" && time - lastFrame < 1000 / 30) return;
+    if (isMobile && time - lastFrame < 1000 / 30) return;
     lastFrame = time;
     candle.update(clock.getElapsedTime(), reducedMotionQuery.matches);
     renderer.render(scene, camera);

@@ -209,7 +209,7 @@ a { color: inherit; }
   border-radius: 50%;
   background: rgba(245,236,220,.94);
 }
-.webgl-candle-fallback__wax { position: absolute; inset: 7% 2% 2%; border-radius: 9% 9% 14% 14%; background: linear-gradient(90deg, #e5dbc9, #f4ecde 45%, #e8decc); }
+.webgl-candle-fallback__wax { position: absolute; inset: 7% 2% 2%; border-radius: 9% 9% 14% 14%; background: linear-gradient(90deg, #e5dbc9, #f4ecde 45%, #e8decc); transform: scaleY(calc(1 - var(--burn-progress, 0) * .18)); transform-origin: center bottom; transition: transform .25s ease; }
 .webgl-candle-fallback__wick { position: absolute; z-index: 4; top: -3%; left: calc(50% - 2px); width: 4px; height: 18%; border-radius: 2px; background: #30211c; }
 .webgl-candle-fallback__flame {
   position: absolute;
@@ -227,6 +227,7 @@ a { color: inherit; }
   animation: fallback-flame 1.4s ease-in-out infinite alternate;
 }
 .webgl-candle-fallback.is-lit .webgl-candle-fallback__flame { display: block; }
+.webgl-candle-fallback.is-extinguished .webgl-candle-fallback__flame { display: none; }
 .webgl-candle-fallback__label {
   position: absolute;
   z-index: 4;
