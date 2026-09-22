@@ -230,7 +230,7 @@ export async function mountRitual3D(container: HTMLElement, onComplete: () => vo
 
   const matchFlame = createFlameVfx(quality);
   matchFlame.group.visible = false;
-  matchFlame.group.scale.set(.57, .6, .57);
+  matchFlame.group.scale.set(.68, .72, .68);
   matchFlame.group.position.set(.69, -.035, 0);
   match.group.add(matchFlame.group);
   const embers = createEmbers(quality);

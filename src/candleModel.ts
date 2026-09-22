@@ -284,7 +284,8 @@ export function createFlameVfx(quality: CandleQuality = "desktop"): {
         vec3 p = position;
         float upper = smoothstep(.12, 1.0, uv.y);
         p.x *= mix(1.0, .48, upper);
-        p.x += sin(uTime * 8.0 + uv.y * 10.0) * .028 * upper;
+        float axialWave = sin(uTime * 8.0 + uv.y * 10.0) * .06;
+        p.x *= 1.0 + axialWave * upper;
         p.y += sin(uTime * 11.0 + uv.y * 7.0) * .014 * upper;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
       }
