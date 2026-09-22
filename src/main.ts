@@ -1,5 +1,5 @@
 import "./style.css";
-import { showCandleFallback } from "./candleFallback";
+import { mountCandleFallback, showCandleFallback } from "./candleFallback";
 
 type Product = {
   name: string;
@@ -448,7 +448,7 @@ const startHero = () => {
       }
     })
     .catch((error) => {
-      showCandleFallback(candleMount, { lit: true, message: "Visualização leve da vela" });
+      showCandleFallback(candleMount, { lit: true, message: "Vela aromática Black Vanilla" });
       console.error("Não foi possível carregar a vela 3D principal.", error);
     })
     .finally(() => {
@@ -549,9 +549,14 @@ const startBurnCandle = () => {
         burnCandle3d = controller;
         controller.setProgress(burnProgress);
       });
-    })
+  })
     .catch((error) => {
-      showCandleFallback(burnCandleMount, { lit: true, message: "Visualização leve da vela" });
+      const fallback = mountCandleFallback(burnCandleMount, { lit: true, message: "Vela aromática Black Vanilla" });
+      burnCandle3d = {
+        setProgress: fallback.setProgress,
+        dispose: fallback.dispose,
+      };
+      fallback.setProgress(burnProgress);
       console.error("Não foi possível carregar a demonstração 3D.", error);
     })
     .finally(() => {

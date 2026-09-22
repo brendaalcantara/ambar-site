@@ -42,7 +42,7 @@ export async function mountBurnCandle3D(container: HTMLElement): Promise<{ setPr
   renderer.domElement.setAttribute("aria-label", "Vela Black Vanilla em 3D demonstrando o tempo de queima");
   const disposeContextFallback = bindWebGLFallback(renderer.domElement, container, {
     lit: true,
-    message: "Modo compatível da vela",
+    message: "Vela aromática Black Vanilla",
   });
 
   let environment: THREE.WebGLRenderTarget | undefined;

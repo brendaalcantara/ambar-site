@@ -58,7 +58,7 @@ export async function mountCandle3D(container: HTMLElement): Promise<() => void>
   renderer.domElement.setAttribute("aria-label", "Vela aromática Black Vanilla em 3D. Arraste para girar.");
   const disposeContextFallback = bindWebGLFallback(renderer.domElement, container, {
     lit: true,
-    message: "Modo compatível da vela",
+    message: "Vela aromática Black Vanilla",
   });
 
   let environment: THREE.WebGLRenderTarget | undefined;

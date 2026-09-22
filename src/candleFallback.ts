@@ -4,43 +4,72 @@ export type CandleFallbackOptions = {
   onActivate?: () => void;
 };
 
-export function showCandleFallback(
+export type CandleFallbackController = {
+  setProgress: (progress: number) => void;
+  ignite: () => void;
+  dispose: () => void;
+};
+
+const fallbackImageUrl = `${import.meta.env.BASE_URL}fallback/ambar-candle-mobile.webp`;
+
+export function mountCandleFallback(
   container: HTMLElement,
   options: CandleFallbackOptions = {},
-): () => void {
+): CandleFallbackController {
   container.querySelector(".webgl-candle-fallback")?.remove();
 
   const fallback = document.createElement(options.onActivate ? "button" : "div");
   fallback.className = `webgl-candle-fallback${options.lit ? " is-lit" : ""}${options.onActivate ? " is-interactive" : ""}`;
-  fallback.setAttribute("aria-label", options.message ?? "Vela aromática Black Vanilla");
+  fallback.setAttribute("aria-label", options.message ?? (options.onActivate ? "Risque o fósforo para acender a vela" : "Vela aromática Black Vanilla"));
   if (fallback instanceof HTMLButtonElement) fallback.type = "button";
 
   fallback.innerHTML = `
     <span class="webgl-candle-fallback__scene" aria-hidden="true">
-      <span class="webgl-candle-fallback__jar">
-        <span class="webgl-candle-fallback__wax"></span>
-        <span class="webgl-candle-fallback__wick"></span>
-        <span class="webgl-candle-fallback__flame"></span>
-        <span class="webgl-candle-fallback__label">
-          <small>ÂMBAR ESSENCE</small>
-          <strong>BLACK VANILLA</strong>
-          <small>CERA VEGETAL · 100g</small>
-        </span>
+      <img class="webgl-candle-fallback__image" src="${fallbackImageUrl}" alt="" decoding="async">
+      <span class="webgl-candle-fallback__flame"></span>
+      <span class="webgl-candle-fallback__match">
+        <span class="webgl-candle-fallback__match-stick"></span>
+        <span class="webgl-candle-fallback__match-head"></span>
       </span>
     </span>
-    <span class="webgl-candle-fallback__message">${options.message ?? "Visualização compatível"}</span>
   `;
 
-  if (options.onActivate) fallback.addEventListener("click", options.onActivate, { once: true });
   container.classList.add("has-webgl-fallback");
   container.append(fallback);
 
-  return () => {
-    fallback.remove();
-    if (!container.querySelector(".webgl-candle-fallback")) {
-      container.classList.remove("has-webgl-fallback");
-    }
+  let ignitionTimer: number | undefined;
+  const ignite = () => {
+    if (!options.onActivate || fallback.classList.contains("is-igniting") || fallback.classList.contains("is-lit")) return;
+    fallback.classList.add("is-igniting");
+    ignitionTimer = window.setTimeout(() => {
+      fallback.classList.remove("is-igniting");
+      fallback.classList.add("is-lit");
+      options.onActivate?.();
+    }, 620);
   };
+  if (options.onActivate) fallback.addEventListener("click", ignite);
+
+  const setProgress = (progress: number) => {
+    const nextProgress = Math.max(0, Math.min(1, progress));
+    fallback.style.setProperty("--burn-progress", String(nextProgress));
+    fallback.classList.toggle("is-extinguished", nextProgress >= .995);
+  };
+
+  const dispose = () => {
+    if (ignitionTimer !== undefined) window.clearTimeout(ignitionTimer);
+    if (options.onActivate) fallback.removeEventListener("click", ignite);
+    fallback.remove();
+    if (!container.querySelector(".webgl-candle-fallback")) container.classList.remove("has-webgl-fallback");
+  };
+
+  return { setProgress, ignite, dispose };
+}
+
+export function showCandleFallback(
+  container: HTMLElement,
+  options: CandleFallbackOptions = {},
+): () => void {
+  return mountCandleFallback(container, options).dispose;
 }
 
 export function bindWebGLFallback(
