@@ -1,24 +1,7 @@
 import "./style.css";
 import { mountCandleFallback, showCandleFallback } from "./candleFallback";
-
-type Product = {
-  name: string;
-  mood: "acolhimento" | "leveza" | "energia" | "natureza";
-  moodLabel: string;
-  notes: string;
-  image: string;
-  imagePosition: string;
-  accent: string;
-  description: string;
-  formats: string;
-};
-
-type Spray = {
-  name: string;
-  profile: string;
-  image: string;
-  imagePosition: string;
-};
+import { visibleCatalog } from "./catalog/load";
+import { escapeAttribute, escapeHtml, imagePositionCss, itemNumber } from "./catalog/render";
 
 type Ritual3DController = {
   ignite: () => void;
@@ -39,95 +22,20 @@ const whatsappUrl = (product = "os produtos da Ámbar Essence") =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Olá! Vim pelo catálogo da Ámbar Essence e gostaria de saber mais sobre ${product}.`)}`;
 const SALES_URL = whatsappUrl();
 
-const products: Product[] = [
-  {
-    name: "Black Vanilla",
-    mood: "acolhimento",
-    moodLabel: "Acolhimento",
-    notes: "Baunilha · Madeiras nobres · Âmbar",
-    image: assetUrl("products/black-vanilla-candle.jpg"),
-    imagePosition: "center 61%",
-    accent: "#A65D45",
-    description: "Marcante, quente e sofisticada. Um convite ao descanso e ao conforto.",
-    formats: "Vela 100g · Home spray 200ml",
-  },
-  {
-    name: "Chá Branco",
-    mood: "leveza",
-    moodLabel: "Leveza",
-    notes: "Floral limpo · Musk · Folhas suaves",
-    image: assetUrl("products/cha-branco-spray.jpg"),
-    imagePosition: "center 55%",
-    accent: "#C9A96A",
-    description: "Delicada e refinada, cria uma atmosfera tranquila e elegante.",
-    formats: "Vela 100g · Home spray 200ml",
-  },
-  {
-    name: "Cereja e Avelã",
-    mood: "acolhimento",
-    moodLabel: "Doçura",
-    notes: "Cereja · Avelã · Notas cremosas",
-    image: assetUrl("products/cereja-avela-candle.jpg"),
-    imagePosition: "center 64%",
-    accent: "#A65D45",
-    description: "Frutada e cremosa, transforma o ambiente em uma memória acolhedora.",
-    formats: "Vela 100g · Home spray 200ml",
-  },
-  {
-    name: "Capim-Limão",
-    mood: "energia",
-    moodLabel: "Energia",
-    notes: "Cítrico · Folhas frescas · Verbena",
-    image: assetUrl("products/capim-limao-candle.jpg"),
-    imagePosition: "center 62%",
-    accent: "#8FA06E",
-    description: "Refrescante e revigorante, ideal para renovar as energias da casa.",
-    formats: "Vela 100g · Home spray 200ml",
-  },
-  {
-    name: "Bambu",
-    mood: "natureza",
-    moodLabel: "Equilíbrio",
-    notes: "Notas verdes · Madeira clara · Orvalho",
-    image: assetUrl("products/bambu-duo.jpg"),
-    imagePosition: "center 58%",
-    accent: "#A3B18A",
-    description: "Leve e contemporânea, equilibra frescor natural e sofisticação.",
-    formats: "Vela 100g · Home spray 200ml",
-  },
-  {
-    name: "Cascas e Folhas",
-    mood: "natureza",
-    moodLabel: "Natureza",
-    notes: "Verde · Cítrico · Amadeirado",
-    image: assetUrl("products/cascas-folhas-duo.jpg"),
-    imagePosition: "center 59%",
-    accent: "#8A5A3B",
-    description: "Verde e amadeirada, traz para dentro de casa a sensação de natureza viva.",
-    formats: "Vela 100g · Home spray 200ml",
-  },
-  {
-    name: "Lavanda Francesa",
-    mood: "leveza",
-    moodLabel: "Serenidade",
-    notes: "Lavanda · Ervas · Flores brancas",
-    image: assetUrl("products/lavanda-duo.jpg"),
-    imagePosition: "center 60%",
-    accent: "#8A5A3B",
-    description: "Floral e serena, desacelera o ambiente e transforma a rotina em ritual.",
-    formats: "Vela 100g · Home spray 200ml",
-  },
-];
-
-const sprays: Spray[] = [
-  { name: "Bambu", profile: "Sofisticado · Verde · Equilibrado", image: assetUrl("products/bambu-spray.jpg"), imagePosition: "center 58%" },
-  { name: "Capim-Limão", profile: "Cítrico · Verde · Refrescante", image: assetUrl("products/capim-limao-spray.jpg"), imagePosition: "center 56%" },
-  { name: "Cascas e Folhas", profile: "Verde · Cítrico · Amadeirado", image: assetUrl("products/cascas-folhas-spray.jpg"), imagePosition: "center 55%" },
-  { name: "Cereja e Avelã", profile: "Frutal · Adocicado · Aveludado", image: assetUrl("products/cereja-avela-spray.jpg"), imagePosition: "center 54%" },
-  { name: "Chá Branco", profile: "Floral · Cítrico · Musk", image: assetUrl("products/cha-branco-spray.jpg"), imagePosition: "center 55%" },
-  { name: "Lavanda Francesa", profile: "Floral · Aromática · Relaxante", image: assetUrl("products/lavanda-spray.jpg"), imagePosition: "center 56%" },
-  { name: "Vanilla", profile: "Envolvente · Âmbar · Notas quentes", image: assetUrl("products/vanilla-spray.jpg"), imagePosition: "center 55%" },
-];
+const products = visibleCatalog.products;
+const sprays = visibleCatalog.sprays;
+const specials = visibleCatalog.specials;
+const moodLabels: Record<string, string> = {
+  acolhimento: "Aconchego",
+  leveza: "Leveza",
+  energia: "Energia",
+  natureza: "Natureza",
+};
+const intentMarkup = ["todos", "acolhimento", "leveza", "energia", "natureza"].map((mood) => {
+  const count = mood === "todos" ? products.length : products.filter((product) => product.mood === mood).length;
+  const label = mood === "todos" ? "Todos" : moodLabels[mood];
+  return `<button class="intent${mood === "todos" ? " active" : ""}" data-filter="${escapeAttribute(mood)}">${escapeHtml(label)} <span>${String(Math.max(count, 0)).padStart(2, "0")}</span></button>`;
+}).join("");
 
 const brandLogo = `
   <span class="brand-lockup" aria-hidden="true">
@@ -253,13 +161,7 @@ app.innerHTML = `
           <p class="eyebrow">Comece pelo que você sente</p>
           <h3>Qual atmosfera<br><em>você quer criar?</em></h3>
         </div>
-        <div class="intent-list" id="intentList">
-          <button class="intent active" data-filter="todos">Todos <span>07</span></button>
-          <button class="intent" data-filter="acolhimento">Aconchego <span>02</span></button>
-          <button class="intent" data-filter="leveza">Leveza <span>02</span></button>
-          <button class="intent" data-filter="energia">Energia <span>01</span></button>
-          <button class="intent" data-filter="natureza">Natureza <span>02</span></button>
-        </div>
+        <div class="intent-list" id="intentList">${intentMarkup}</div>
       </section>
 
       <section class="collection" id="colecao">
@@ -269,7 +171,7 @@ app.innerHTML = `
             <h3>Um aroma para<br><em>cada estado de alma.</em></h3>
           </div>
           <div class="section-heading-aside">
-            <span>7 aromas · 2 formatos</span>
+            <span>${products.length} aromas · 2 formatos</span>
             <p>Conheça as fragrâncias e escolha entre vela artesanal ou home spray. A compra é concluída no canal oficial da marca.</p>
           </div>
         </div>
@@ -310,16 +212,7 @@ app.innerHTML = `
           <h3>Edições <em>especiais.</em></h3>
           <p>Criações sazonais e recipientes que transformam o aroma em objeto de presença.</p>
         </div>
-        <div class="special-grid">
-          <article class="special-card">
-            <div class="special-photo"><img src="${assetUrl("products/moscow-mule.jpg")}" alt="Vela Moscow Mule Ámbar Essence" loading="lazy" decoding="async"></div>
-            <div class="special-info"><span>Edição especial · 150g</span><h4>Moscow Mule</h4><p>Limão siciliano e baunilha em cera de coco. Aproximadamente 30 horas de queima.</p><a href="${whatsappUrl("a vela Moscow Mule")}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
-          </article>
-          <article class="special-card special-card--reverse">
-            <div class="special-photo"><img src="${assetUrl("products/coconut-candle.jpg")}" alt="Vela artesanal em casca de coco Ámbar Essence" loading="lazy" decoding="async"></div>
-            <div class="special-info"><span>Edição especial · artesanal</span><h4>Vela em casca de coco</h4><p>Recipiente natural, dois pavios e uma presença tropical para composições especiais.</p><a href="${whatsappUrl("a vela em casca de coco")}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
-          </article>
-        </div>
+        <div class="special-grid" id="specialGrid"></div>
       </section>
 
       <section class="burn-section" id="rituais">
@@ -395,33 +288,41 @@ app.innerHTML = `
 const productGrid = document.querySelector<HTMLDivElement>("#productGrid")!;
 function renderProducts(filter = "todos") {
   const visibleProducts = products.filter((product) => filter === "todos" || product.mood === filter);
-  productGrid.innerHTML = visibleProducts.map((product, index) => `
-    <article class="product-card" style="--delay:${index * 70}ms;--product-accent:${product.accent};--image-position:${product.imagePosition}">
+  productGrid.innerHTML = visibleProducts.length ? visibleProducts.map((product, index) => `
+    <article class="product-card" style="--delay:${index * 70}ms;--product-accent:${escapeAttribute(product.accent)};--image-position:${imagePositionCss(product.imagePosition)}">
       <div class="product-visual">
         <div class="catalog-photo">
-          <img src="${product.image}" alt="Vela aromática ${product.name} da Ámbar Essence" loading="lazy" decoding="async">
+          <img src="${escapeAttribute(assetUrl(product.image))}" alt="${escapeAttribute(product.imageAlt)}" loading="lazy" decoding="async">
         </div>
-        <div class="product-topline"><span>0${products.indexOf(product) + 1}</span><span>${product.moodLabel}</span></div>
-        <a class="quick-view" href="${whatsappUrl(product.name)}" target="_blank" rel="noreferrer" aria-label="Comprar ${product.name} pelo WhatsApp">${flameIcon}</a>
+        <div class="product-topline"><span>${itemNumber(index)}</span><span>${escapeHtml(product.moodLabel)}</span></div>
+        <a class="quick-view" href="${escapeAttribute(whatsappUrl(product.name))}" target="_blank" rel="noreferrer" aria-label="Comprar ${escapeAttribute(product.name)} pelo WhatsApp">${flameIcon}</a>
       </div>
       <div class="product-info">
-        <div><p class="product-mood">${product.moodLabel}</p><h4>${product.name}</h4></div>
-        <strong>${product.formats}</strong>
+        <div><p class="product-mood">${escapeHtml(product.moodLabel)}</p><h4>${escapeHtml(product.name)}</h4></div>
+        <strong>${escapeHtml(product.formats)}</strong>
       </div>
-      <p class="notes">${product.notes}</p>
-      <div class="product-foot"><span>${product.description}</span><a class="catalog-cta" href="${whatsappUrl(product.name)}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
+      <p class="notes">${escapeHtml(product.notes)}</p>
+      <div class="product-foot"><span>${escapeHtml(product.description)}</span><a class="catalog-cta" href="${escapeAttribute(whatsappUrl(product.name))}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
     </article>
-  `).join("");
+  `).join("") : `<p class="catalog-empty" role="status">Nenhum aroma está disponível nesta intenção.</p>`;
 }
 
 const sprayGrid = document.querySelector<HTMLDivElement>("#sprayGrid")!;
-sprayGrid.innerHTML = sprays.map((spray, index) => `
-  <article class="spray-card" style="--spray-position:${spray.imagePosition};--delay:${index * 55}ms">
-    <div class="spray-photo"><img src="${spray.image}" alt="Home spray ${spray.name} da Ámbar Essence" loading="lazy" decoding="async"></div>
-    <span class="spray-number">${String(index + 1).padStart(2, "0")}</span>
-    <div class="spray-info"><h4>${spray.name}</h4><p>${spray.profile}</p><a href="${whatsappUrl(`o home spray ${spray.name}`)}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
+sprayGrid.innerHTML = sprays.length ? sprays.map((spray, index) => `
+  <article class="spray-card" style="--spray-position:${imagePositionCss(spray.imagePosition)};--delay:${index * 55}ms">
+    <div class="spray-photo"><img src="${escapeAttribute(assetUrl(spray.image))}" alt="${escapeAttribute(spray.imageAlt)}" loading="lazy" decoding="async"></div>
+    <span class="spray-number">${itemNumber(index)}</span>
+    <div class="spray-info"><h4>${escapeHtml(spray.name)}</h4><p>${escapeHtml(spray.profile)}</p>${spray.description ? `<small class="spray-description">${escapeHtml(spray.description)}</small>` : ""}<a href="${escapeAttribute(whatsappUrl(`o home spray ${spray.name}`))}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
   </article>
-`).join("");
+`).join("") : `<p class="catalog-empty" role="status">Nenhum home spray está disponível no momento.</p>`;
+
+const specialGrid = document.querySelector<HTMLDivElement>("#specialGrid")!;
+specialGrid.innerHTML = specials.length ? specials.map((special, index) => `
+  <article class="special-card${index % 2 === 1 ? " special-card--reverse" : ""}">
+    <div class="special-photo"><img src="${escapeAttribute(assetUrl(special.image))}" alt="${escapeAttribute(special.imageAlt)}" loading="lazy" decoding="async" style="object-position:${imagePositionCss(special.imagePosition)}"></div>
+    <div class="special-info"><span>${escapeHtml(special.line)}</span><h4>${escapeHtml(special.name)}</h4><p>${escapeHtml(special.description)}</p><a href="${escapeAttribute(whatsappUrl(`a ${special.name}`))}" target="_blank" rel="noreferrer">Comprar ${flameIcon}</a></div>
+  </article>
+`).join("") : `<p class="catalog-empty" role="status">Nenhuma edição especial está disponível no momento.</p>`;
 
 renderProducts();
 document.querySelectorAll<HTMLButtonElement>(".intent").forEach((button) => button.addEventListener("click", () => {

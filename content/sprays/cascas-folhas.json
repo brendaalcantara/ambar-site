@@ -1,0 +1,10 @@
+{
+  "id": "cascas-folhas",
+  "name": "Cascas e Folhas",
+  "profile": "Verde · Cítrico · Amadeirado",
+  "image": "products/cascas-folhas-spray.jpg",
+  "imageAlt": "Home spray Cascas e Folhas da Ámbar Essence",
+  "imagePosition": "center 55%",
+  "visible": true,
+  "order": 30
+}

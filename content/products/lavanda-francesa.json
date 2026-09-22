@@ -1,0 +1,15 @@
+{
+  "id": "lavanda-francesa",
+  "name": "Lavanda Francesa",
+  "description": "Floral e serena, desacelera o ambiente e transforma a rotina em ritual.",
+  "image": "products/lavanda-duo.jpg",
+  "imageAlt": "Vela aromática Lavanda Francesa da Ámbar Essence",
+  "imagePosition": "center 60%",
+  "visible": true,
+  "order": 70,
+  "mood": "leveza",
+  "moodLabel": "Serenidade",
+  "notes": "Lavanda · Ervas · Flores brancas",
+  "formats": "Vela 100g · Home spray 200ml",
+  "accent": "#8A5A3B"
+}

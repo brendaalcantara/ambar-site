@@ -1,0 +1,15 @@
+{
+  "id": "cascas-folhas",
+  "name": "Cascas e Folhas",
+  "description": "Verde e amadeirada, traz para dentro de casa a sensação de natureza viva.",
+  "image": "products/cascas-folhas-duo.jpg",
+  "imageAlt": "Vela aromática Cascas e Folhas da Ámbar Essence",
+  "imagePosition": "center 59%",
+  "visible": true,
+  "order": 60,
+  "mood": "natureza",
+  "moodLabel": "Natureza",
+  "notes": "Verde · Cítrico · Amadeirado",
+  "formats": "Vela 100g · Home spray 200ml",
+  "accent": "#8A5A3B"
+}

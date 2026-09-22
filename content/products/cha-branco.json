@@ -1,0 +1,15 @@
+{
+  "id": "cha-branco",
+  "name": "Chá Branco",
+  "description": "Delicada e refinada, cria uma atmosfera tranquila e elegante.",
+  "image": "products/cha-branco-spray.jpg",
+  "imageAlt": "Home spray Chá Branco da Ámbar Essence",
+  "imagePosition": "center 55%",
+  "visible": true,
+  "order": 20,
+  "mood": "leveza",
+  "moodLabel": "Leveza",
+  "notes": "Floral limpo · Musk · Folhas suaves",
+  "formats": "Vela 100g · Home spray 200ml",
+  "accent": "#C9A96A"
+}

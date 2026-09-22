@@ -1,0 +1,10 @@
+{
+  "id": "cha-branco",
+  "name": "Chá Branco",
+  "profile": "Floral · Cítrico · Musk",
+  "image": "products/cha-branco-spray.jpg",
+  "imageAlt": "Home spray Chá Branco da Ámbar Essence",
+  "imagePosition": "center 55%",
+  "visible": true,
+  "order": 50
+}

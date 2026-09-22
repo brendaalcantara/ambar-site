@@ -1,0 +1,11 @@
+{
+  "id": "moscow-mule",
+  "name": "Moscow Mule",
+  "line": "Edição especial · 150g",
+  "description": "Limão siciliano e baunilha em cera de coco. Aproximadamente 30 horas de queima.",
+  "image": "products/moscow-mule.jpg",
+  "imageAlt": "Vela Moscow Mule da Ámbar Essence",
+  "imagePosition": "center 58%",
+  "visible": true,
+  "order": 10
+}

@@ -1,0 +1,10 @@
+{
+  "id": "vanilla",
+  "name": "Vanilla",
+  "profile": "Envolvente · Âmbar · Notas quentes",
+  "image": "products/vanilla-spray.jpg",
+  "imageAlt": "Home spray Vanilla da Ámbar Essence",
+  "imagePosition": "center 55%",
+  "visible": true,
+  "order": 70
+}

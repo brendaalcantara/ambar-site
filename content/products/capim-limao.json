@@ -1,0 +1,15 @@
+{
+  "id": "capim-limao",
+  "name": "Capim-Limão",
+  "description": "Refrescante e revigorante, ideal para renovar as energias da casa.",
+  "image": "products/capim-limao-candle.jpg",
+  "imageAlt": "Vela aromática Capim-Limão da Ámbar Essence",
+  "imagePosition": "center 62%",
+  "visible": true,
+  "order": 40,
+  "mood": "energia",
+  "moodLabel": "Energia",
+  "notes": "Cítrico · Folhas frescas · Verbena",
+  "formats": "Vela 100g · Home spray 200ml",
+  "accent": "#8FA06E"
+}

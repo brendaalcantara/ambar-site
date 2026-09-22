@@ -1,0 +1,10 @@
+{
+  "id": "bambu",
+  "name": "Bambu",
+  "profile": "Sofisticado · Verde · Equilibrado",
+  "image": "products/bambu-spray.jpg",
+  "imageAlt": "Home spray Bambu da Ámbar Essence",
+  "imagePosition": "center 58%",
+  "visible": true,
+  "order": 10
+}

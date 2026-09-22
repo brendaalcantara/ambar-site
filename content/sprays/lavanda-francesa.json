@@ -1,0 +1,10 @@
+{
+  "id": "lavanda-francesa",
+  "name": "Lavanda Francesa",
+  "profile": "Floral · Aromática · Relaxante",
+  "image": "products/lavanda-spray.jpg",
+  "imageAlt": "Home spray Lavanda Francesa da Ámbar Essence",
+  "imagePosition": "center 56%",
+  "visible": true,
+  "order": 60
+}

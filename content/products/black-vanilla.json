@@ -1,0 +1,15 @@
+{
+  "id": "black-vanilla",
+  "name": "Black Vanilla",
+  "description": "Marcante, quente e sofisticada. Um convite ao descanso e ao conforto.",
+  "image": "products/black-vanilla-candle.jpg",
+  "imageAlt": "Vela aromática Black Vanilla da Ámbar Essence",
+  "imagePosition": "center 61%",
+  "visible": true,
+  "order": 10,
+  "mood": "acolhimento",
+  "moodLabel": "Acolhimento",
+  "notes": "Baunilha · Madeiras nobres · Âmbar",
+  "formats": "Vela 100g · Home spray 200ml",
+  "accent": "#A65D45"
+}

@@ -595,6 +595,14 @@ a { color: inherit; }
   line-height: 1.6;
 }
 .product-foot > span { max-width: 235px; }
+.catalog-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 34px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
 .catalog-cta {
   flex: 0 0 auto;
   display: inline-flex;
@@ -662,6 +670,7 @@ a { color: inherit; }
 .spray-info { padding-top: 18px; }
 .spray-info h4 { margin: 0; font: 500 27px 'Cormorant Garamond', serif; }
 .spray-info p { min-height: 29px; margin: 5px 0 17px; color: var(--brown); font: italic 14px 'Cormorant Garamond', serif; }
+.spray-info .spray-description { display: block; min-height: 0; margin: -8px 0 17px; color: var(--muted); font-size: 10px; line-height: 1.6; }
 .spray-info a { display: inline-flex; align-items: center; gap: 7px; padding-bottom: 4px; border-bottom: 1px solid var(--ink); color: var(--ink); text-decoration: none; font-size: 8px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
 .spray-info a .brand-icon { width: 15px; height: 15px; color: var(--terracotta); }
 

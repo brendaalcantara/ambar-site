@@ -1,0 +1,11 @@
+{
+  "id": "vela-casca-coco",
+  "name": "Vela em casca de coco",
+  "line": "Edição especial · artesanal",
+  "description": "Recipiente natural, dois pavios e uma presença tropical para composições especiais.",
+  "image": "products/coconut-candle.jpg",
+  "imageAlt": "Vela artesanal em casca de coco da Ámbar Essence",
+  "imagePosition": "center 57%",
+  "visible": true,
+  "order": 20
+}

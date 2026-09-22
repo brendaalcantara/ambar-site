@@ -1,0 +1,5 @@
+# Copie para functions/.dev.vars somente em ambiente local.
+GITHUB_CLIENT_ID=coloque-o-client-id-aqui
+GITHUB_CLIENT_SECRET=coloque-o-client-secret-aqui
+PUBLIC_SITE_ORIGIN=http://127.0.0.1:8788
+GITHUB_OAUTH_SCOPE=public_repo

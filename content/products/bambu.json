@@ -1,0 +1,15 @@
+{
+  "id": "bambu",
+  "name": "Bambu",
+  "description": "Leve e contemporânea, equilibra frescor natural e sofisticação.",
+  "image": "products/bambu-duo.jpg",
+  "imageAlt": "Vela aromática Bambu da Ámbar Essence",
+  "imagePosition": "center 58%",
+  "visible": true,
+  "order": 50,
+  "mood": "natureza",
+  "moodLabel": "Equilíbrio",
+  "notes": "Notas verdes · Madeira clara · Orvalho",
+  "formats": "Vela 100g · Home spray 200ml",
+  "accent": "#A3B18A"
+}

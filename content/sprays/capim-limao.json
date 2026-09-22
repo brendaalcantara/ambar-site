@@ -1,0 +1,10 @@
+{
+  "id": "capim-limao",
+  "name": "Capim-Limão",
+  "profile": "Cítrico · Verde · Refrescante",
+  "image": "products/capim-limao-spray.jpg",
+  "imageAlt": "Home spray Capim-Limão da Ámbar Essence",
+  "imagePosition": "center 56%",
+  "visible": true,
+  "order": 20
+}

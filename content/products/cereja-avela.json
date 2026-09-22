@@ -1,0 +1,15 @@
+{
+  "id": "cereja-avela",
+  "name": "Cereja e Avelã",
+  "description": "Frutada e cremosa, transforma o ambiente em uma memória acolhedora.",
+  "image": "products/cereja-avela-candle.jpg",
+  "imageAlt": "Vela aromática Cereja e Avelã da Ámbar Essence",
+  "imagePosition": "center 64%",
+  "visible": true,
+  "order": 30,
+  "mood": "acolhimento",
+  "moodLabel": "Doçura",
+  "notes": "Cereja · Avelã · Notas cremosas",
+  "formats": "Vela 100g · Home spray 200ml",
+  "accent": "#A65D45"
+}
