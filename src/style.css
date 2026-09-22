@@ -209,7 +209,7 @@ a { color: inherit; }
 .webgl-candle-fallback__flame-image,
 .webgl-candle-fallback__match-image,
 .webgl-candle-fallback__match-flame-image { display: block; width: 100%; height: 100%; object-fit: contain; }
-.webgl-candle-fallback__flame-image { animation: fallback-flame 1.15s ease-in-out infinite alternate; }
+.webgl-candle-fallback__flame-image { animation: fallback-flame 1.15s ease-in-out infinite; }
 .webgl-candle-fallback.is-lit .webgl-candle-fallback__flame { opacity: 1; transform: translateX(-50%) scale(1); }
 .webgl-candle-fallback.is-extinguished .webgl-candle-fallback__flame { opacity: 0; transform: translateX(-50%) scale(.7); }
 .webgl-candle-fallback__match {
@@ -227,20 +227,25 @@ a { color: inherit; }
 .webgl-candle-fallback__match-flame {
   position: absolute;
   top: -16%;
-  left: 72%;
-  width: 18%;
-  height: 32%;
+  left: 66%;
+  width: 28%;
+  height: 36%;
   opacity: 0;
-  transform: rotate(8deg) scale(.65);
+  transform: scale(.65);
   transform-origin: 50% 100%;
   transition: opacity .2s ease, transform .32s cubic-bezier(.2,.8,.2,1);
 }
 .webgl-candle-fallback.is-igniting .webgl-candle-fallback__match { top: 21%; left: 9%; transform: translate(0, 0) scale(1); }
-.webgl-candle-fallback.is-igniting .webgl-candle-fallback__match-flame { opacity: 1; transform: rotate(8deg) scale(1); }
+.webgl-candle-fallback.is-igniting .webgl-candle-fallback__match-flame { opacity: 1; transform: scale(1); }
 .webgl-candle-fallback.is-lit .webgl-candle-fallback__match { opacity: 0; transform: translate(14px, -9px) scale(.96); }
 .webgl-candle-fallback:not(.is-interactive) .webgl-candle-fallback__match { display: none; }
 .webgl-candle-fallback__message { display: none; }
-@keyframes fallback-flame { to { transform: rotate(-3deg) scale(.94, 1.05); } }
+@keyframes fallback-flame {
+  0%, 100% { transform: translate3d(0, 0, 0) scaleX(1) scaleY(1); }
+  28% { transform: translate3d(0, -1px, 0) scaleX(.96) scaleY(1.03); }
+  58% { transform: translate3d(0, 1px, 0) scaleX(1.04) scaleY(.98); }
+  82% { transform: translate3d(0, 0, 0) scaleX(.98) scaleY(1.04); }
+}
 
 @keyframes ritual-white-reveal {
   0% { opacity: .04; filter: blur(54px); transform: scale(.8); }
