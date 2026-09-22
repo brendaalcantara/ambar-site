@@ -29,6 +29,7 @@ O catálogo migrado contém 7 velas, 7 home sprays e 2 edições especiais. O bu
 - Cloudflare Pages: projeto `ambar-site`, branch `main`, build concluído com status `success`, saída `dist` e Functions detectadas em `/functions`.
 - Rotas públicas verificadas com HTTP 200: `https://ambar-site.pages.dev/` e `https://ambar-site.pages.dev/admin/`.
 - OAuth público verificado: `https://ambar-site.pages.dev/api/auth?provider=github` respondeu HTTP 302 para o GitHub, com `state` e cookie de sessão; o retorno autorizado abriu o painel autenticado.
+- O cliente OAuth Google, a GitHub App limitada ao repositório e os seis secrets do ambiente Production foram configurados; a validação final do callback Google ocorre após a publicação deste commit.
 - Painel autenticado verificado em `https://ambar-site.pages.dev/admin/`: três coleções disponíveis e sete entradas de Velas listadas (o acervo validado localmente continua 7/7/2).
 - GitHub Pages preservado e respondendo HTTP 200 em `https://brendaalcantara.github.io/ambar-site/` e `/ambar-site/admin/`; nenhum DNS foi alterado.
 

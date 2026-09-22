@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "decap-cms-app": "^3.16.3",
+    "decap-cms-backend-github": "^3.8.3",
+    "decap-cms-lib-auth": "^3.3.2",
+    "decap-cms-ui-default": "^3.9.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "three": "^0.165.0",

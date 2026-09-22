@@ -122,7 +122,7 @@ const folderCollection = (name: string, label: string, folder: string, fields: u
 
 export const decapConfig = {
   backend: {
-    name: "github",
+    name: "ambar-github",
     repo: "brendaalcantara/ambar-site",
     branch: "main",
     base_url: origin,

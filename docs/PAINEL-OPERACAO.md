@@ -4,13 +4,13 @@ O painel fica em [`https://ambar-site.pages.dev/admin/`](https://ambar-site.page
 
 ## Quem pode editar
 
-Cada pessoa precisa de uma conta GitHub com permissão de escrita no repositório `brendaalcantara/ambar-site`. O painel não cria usuários próprios e não usa banco de dados. A permissão é do repositório inteiro, então ela deve ser concedida apenas a quem pode alterar o site.
+Cada pessoa precisa estar na lista de contas Google autorizadas. A GitHub App do painel mantém a permissão de escrita no repositório `brendaalcantara/ambar-site` somente no servidor; os editores não precisam de uma conta GitHub com acesso direto. O painel não cria usuários próprios e não usa banco de dados. A lista de e-mails autorizados deve conter apenas pessoas que podem alterar o site.
 
-O endereço público do painel não é uma barreira de acesso. A proteção depende do login OAuth do GitHub, da permissão no repositório e das secrets configuradas no ambiente de hospedagem.
+O endereço público do painel não é uma barreira de acesso. A proteção depende do login Google, da lista de e-mails autorizados, da GitHub App limitada ao repositório e das secrets configuradas no ambiente de hospedagem.
 
 ## Editar um item
 
-1. Abra [`https://ambar-site.pages.dev/admin/`](https://ambar-site.pages.dev/admin/) e entre com o GitHub.
+1. Abra [`https://ambar-site.pages.dev/admin/`](https://ambar-site.pages.dev/admin/) e entre com o Google autorizado. O GitHub permanece disponível como alternativa durante a transição.
 2. Escolha uma das três coleções.
 3. Edite os campos e use a prévia desktop/mobile antes de salvar.
 4. Para ocultar um item sem perder seus dados, desative **Visível no catálogo**. Para remover de vez, use a exclusão e confirme.

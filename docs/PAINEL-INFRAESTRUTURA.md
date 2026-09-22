@@ -11,16 +11,22 @@
 
 ## OAuth
 
-As Pages Functions nunca colocam o segredo do GitHub no bundle. Configure apenas no ambiente privado da hospedagem:
+As Pages Functions nunca colocam segredos no bundle. O Google autentica a identidade do editor e a GitHub App entrega, somente no servidor, um token de instalação com permissão de conteúdo no repositório. Configure apenas no ambiente privado da hospedagem:
 
 ```text
 GITHUB_CLIENT_ID
 GITHUB_CLIENT_SECRET
 PUBLIC_SITE_ORIGIN
 GITHUB_OAUTH_SCOPE=public_repo
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+GOOGLE_ALLOWED_EMAILS
+GITHUB_APP_ID
+GITHUB_APP_INSTALLATION_ID
+GITHUB_APP_PRIVATE_KEY
 ```
 
-O fluxo usa `state` aleatório em cookie `HttpOnly`, `Secure` (em HTTPS) e `SameSite=Lax`, valida a origem exata e troca o `code` no servidor. O popup só aceita mensagens do opener e da origem confiável. Não use PAT, token no código, query string de origem ou `postMessage` com `*`.
+O fluxo usa `state` aleatório em cookie `HttpOnly`, `Secure` (em HTTPS) e `SameSite=Lax`, valida a origem exata, verifica a assinatura e o e-mail permitido do ID token do Google e troca o `code` no servidor. A GitHub App fica limitada ao repositório `brendaalcantara/ambar-site`; a chave privada nunca é enviada ao navegador. O popup só aceita mensagens do opener e da origem confiável. Não use PAT, token no código, query string de origem ou `postMessage` com `*`.
 
 Para desenvolvimento local, copie `functions/.dev.vars.example` para `functions/.dev.vars` e preencha valores de teste. O arquivo real é ignorado pelo Git.
 

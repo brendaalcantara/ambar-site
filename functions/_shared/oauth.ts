@@ -1,8 +1,16 @@
+export type OAuthProvider = "github" | "google";
+
 export type OAuthEnv = {
-  GITHUB_CLIENT_ID: string;
-  GITHUB_CLIENT_SECRET: string;
-  PUBLIC_SITE_ORIGIN: string;
+  GITHUB_CLIENT_ID?: string;
+  GITHUB_CLIENT_SECRET?: string;
   GITHUB_OAUTH_SCOPE?: string;
+  GITHUB_APP_ID?: string;
+  GITHUB_APP_INSTALLATION_ID?: string;
+  GITHUB_APP_PRIVATE_KEY?: string;
+  GOOGLE_CLIENT_ID?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  GOOGLE_ALLOWED_EMAILS?: string;
+  PUBLIC_SITE_ORIGIN: string;
 };
 
 export const STATE_COOKIE = "ambar_oauth_state";
@@ -53,16 +61,43 @@ export const safeEqual = (left: string, right: string) => {
   return difference === 0;
 };
 
-export const errorPage = (message: string, origin: string, cookie?: string) => callbackPage({ origin, error: message, cookie });
+export const errorPage = (
+  message: string,
+  origin: string,
+  cookie?: string,
+  messageProvider: OAuthProvider = "github",
+) => callbackPage({ origin, error: message, cookie, messageProvider });
 
 const scriptJson = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/&/g, "\\u0026");
 
-export const callbackPage = ({ origin, token, error, cookie }: { origin: string; token?: string; error?: string; cookie?: string }) => {
+export const callbackPage = ({
+  origin,
+  token,
+  error,
+  cookie,
+  messageProvider = "github",
+  credentialProvider = "github",
+  editor,
+}: {
+  origin: string;
+  token?: string;
+  error?: string;
+  cookie?: string;
+  messageProvider?: OAuthProvider;
+  credentialProvider?: "github";
+  editor?: { login: string; name: string; email?: string };
+}) => {
   const nonceBytes = new Uint8Array(18);
   crypto.getRandomValues(nonceBytes);
   const nonce = btoa(String.fromCharCode(...nonceBytes)).replace(/=+$/g, "");
-  const success = token ? `authorization:github:success:${scriptJson({ token, provider: "github" })}` : "";
-  const failure = error ? `authorization:github:error:${scriptJson({ message: error })}` : "";
+  const success = token
+    ? `authorization:${messageProvider}:success:${scriptJson({
+        token,
+        provider: credentialProvider,
+        ...(editor ? { editor } : {}),
+      })}`
+    : "";
+  const failure = error ? `authorization:${messageProvider}:error:${scriptJson({ message: error })}` : "";
   const message = success || failure;
   const headers = new Headers(noStoreHeaders({
     "Content-Type": "text/html; charset=utf-8",
@@ -77,13 +112,13 @@ export const callbackPage = ({ origin, token, error, cookie }: { origin: string;
   if (!opener) return;
   const send = () => opener.postMessage(message, trustedOrigin);
   const receive = event => {
-    if (event.origin !== trustedOrigin || event.source !== opener || event.data !== 'authorizing:github') return;
+    if (event.origin !== trustedOrigin || event.source !== opener || event.data !== ${scriptJson(`authorizing:${messageProvider}`)}) return;
     window.removeEventListener('message', receive);
     send();
     window.setTimeout(() => window.close(), 250);
   };
   window.addEventListener('message', receive);
-  opener.postMessage('authorizing:github', trustedOrigin);
+  opener.postMessage(${scriptJson(`authorizing:${messageProvider}`)}, trustedOrigin);
 })();
 </script></body></html>`;
   return new Response(body, { status: 200, headers });
