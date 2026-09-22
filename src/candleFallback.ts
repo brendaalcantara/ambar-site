@@ -11,6 +11,8 @@ export type CandleFallbackController = {
 };
 
 const fallbackImageUrl = `${import.meta.env.BASE_URL}fallback/ambar-candle-mobile.webp`;
+const fallbackMatchUrl = `${import.meta.env.BASE_URL}fallback/ambar-match-mobile.webp`;
+const fallbackFlameUrl = `${import.meta.env.BASE_URL}fallback/ambar-flame-mobile.webp`;
 
 export function mountCandleFallback(
   container: HTMLElement,
@@ -26,10 +28,14 @@ export function mountCandleFallback(
   fallback.innerHTML = `
     <span class="webgl-candle-fallback__scene" aria-hidden="true">
       <img class="webgl-candle-fallback__image" src="${fallbackImageUrl}" alt="" decoding="async">
-      <span class="webgl-candle-fallback__flame"></span>
+      <span class="webgl-candle-fallback__flame">
+        <img class="webgl-candle-fallback__flame-image" src="${fallbackFlameUrl}" alt="" decoding="async">
+      </span>
       <span class="webgl-candle-fallback__match">
-        <span class="webgl-candle-fallback__match-stick"></span>
-        <span class="webgl-candle-fallback__match-head"></span>
+        <img class="webgl-candle-fallback__match-image" src="${fallbackMatchUrl}" alt="" decoding="async">
+        <span class="webgl-candle-fallback__match-flame">
+          <img class="webgl-candle-fallback__match-flame-image" src="${fallbackFlameUrl}" alt="" decoding="async">
+        </span>
       </span>
     </span>
   `;

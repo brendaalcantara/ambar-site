@@ -502,7 +502,7 @@ const startRitual = () => {
     })
     .catch((error) => {
       showCandleFallback(ritual3dMount, {
-        message: "Toque na vela para continuar",
+        message: "Risque o fósforo para acender a vela",
         onActivate: enterSite,
       });
       console.error("Não foi possível carregar o ritual 3D.", error);
