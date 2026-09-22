@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex,nofollow" />
     <title>Painel do catálogo · Ámbar Essence</title>
+    <script>
+      (() => {
+        const canonicalAdmin = "https://ambar-site.pages.dev/admin/";
+        if (window.location.origin !== "https://ambar-site.pages.dev") {
+          const hash = window.location.hash || "#/";
+          window.location.replace(`${canonicalAdmin}${hash}`);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="nc-root"></div>
