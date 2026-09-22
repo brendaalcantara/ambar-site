@@ -23,9 +23,16 @@ O catálogo migrado contém 7 velas, 7 home sprays e 2 edições especiais. O bu
 - Vite local: `/` abriu o catálogo renderizado e `/admin/` abriu a tela de login do Decap.
 - Wrangler Pages local: `/` e `/admin/` responderam 200; sem secrets, `/api/auth` falhou fechado; com valores fictícios, respondeu 302 para o GitHub com `state` e cookie de sessão.
 
-## Ainda depende de integração externa
+## Evidência de integração externa
 
-O login real, o commit feito pelo painel, o upload para GitHub, a execução do workflow e o OAuth em Cloudflare ainda precisam de uma conta autorizada, secrets e ambiente de hospedagem. Portanto, estes checks locais não são declaração de publicação nem de OAuth funcionando em produção.
+- Commit publicado no GitHub: `bc5e281` (`feat: add Decap catalog admin panel`).
+- Cloudflare Pages: projeto `ambar-site`, branch `main`, build concluído com status `success`, saída `dist` e Functions detectadas em `/functions`.
+- Rotas públicas verificadas com HTTP 200: `https://ambar-site.pages.dev/` e `https://ambar-site.pages.dev/admin/`.
+- OAuth público verificado: `https://ambar-site.pages.dev/api/auth?provider=github` respondeu HTTP 302 para o GitHub, com `state` e cookie de sessão; o retorno autorizado abriu o painel autenticado.
+- Painel autenticado verificado em `https://ambar-site.pages.dev/admin/`: três coleções disponíveis e sete entradas de Velas listadas (o acervo validado localmente continua 7/7/2).
+- GitHub Pages preservado e respondendo HTTP 200 em `https://brendaalcantara.github.io/ambar-site/` e `/ambar-site/admin/`; nenhum DNS foi alterado.
+
+O commit de conteúdo pelo painel, o upload real de uma foto e o teste destrutivo de excluir/reativar um item ainda não foram executados para não alterar o catálogo real durante a configuração. Eles devem ser feitos com um item autorizado de teste antes de uma migração definitiva de domínio.
 
 ## Revisão visual recomendada
 

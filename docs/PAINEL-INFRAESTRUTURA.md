@@ -6,7 +6,7 @@
 - `src/admin/config.ts` define as três coleções, o backend GitHub e a localização das mídias.
 - `src/admin/image-control.tsx` e `src/admin/image-processing.ts` fazem a preparação local da foto antes do upload.
 - `content/products`, `content/sprays` e `content/specials` guardam um JSON por item.
-- `functions/api/auth.ts` e `functions/api/callback.ts` implementam o OAuth no formato Pages Functions para uma futura hospedagem Cloudflare.
+- `functions/api/auth.ts` e `functions/api/callback.ts` implementam o OAuth no formato Pages Functions usado no projeto Cloudflare Pages.
 - `scripts/validate-catalog.mjs` verifica campos, IDs, caminhos locais e existência das imagens durante o build.
 
 ## OAuth
@@ -24,8 +24,10 @@ O fluxo usa `state` aleatório em cookie `HttpOnly`, `Secure` (em HTTPS) e `Same
 
 Para desenvolvimento local, copie `functions/.dev.vars.example` para `functions/.dev.vars` e preencha valores de teste. O arquivo real é ignorado pelo Git.
 
-## Hospedagem atual e próxima etapa
+## Hospedagem e ambientes
 
-O site público continua no GitHub Pages enquanto o painel é validado. O workflow passa `VITE_BASE_PATH=/ambar-site/` para preservar os caminhos atuais. Em Cloudflare Pages, a base passa a ser `/` e as Functions ficam em `/api/auth` e `/api/callback`.
+O site público legado continua no [GitHub Pages](https://brendaalcantara.github.io/ambar-site/), com o workflow passando `VITE_BASE_PATH=/ambar-site/` para preservar os caminhos atuais. O painel operacional está publicado no projeto [Cloudflare Pages](https://ambar-site.pages.dev/) na raiz, onde a base é `/` e as Functions ficam em `/api/auth` e `/api/callback`.
 
-A migração de produção, troca de DNS, criação da aplicação OAuth no GitHub e cadastro das secrets são etapas externas. Elas exigem acesso à conta da hospedagem e só devem ser executadas depois da validação local do painel.
+O projeto Cloudflare `ambar-site` está conectado ao repositório `brendaalcantara/ambar-site`, branch `main`, com `npm run build` e saída `dist`. A aplicação OAuth do GitHub usa o callback `https://ambar-site.pages.dev/api/callback`; as quatro configurações do fluxo foram cadastradas como secrets do ambiente Production no Cloudflare. Nenhuma chave é enviada ao bundle, ao Git ou ao chat.
+
+O DNS e o domínio personalizado não foram alterados. A troca definitiva de domínio ou a retirada do GitHub Pages continua sendo uma etapa separada, para ser feita somente quando a validação do novo endereço estiver concluída.

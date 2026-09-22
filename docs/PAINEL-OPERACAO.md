@@ -1,6 +1,6 @@
 # Painel do catálogo Ámbar Essence
 
-O painel fica em `/admin/` e usa Decap CMS para editar os arquivos JSON versionados no próprio repositório. As coleções disponíveis são **Velas**, **Home sprays** e **Edições especiais**. O botão de publicar grava um commit simples no GitHub; o deploy do site é uma etapa separada do GitHub Pages/Cloudflare.
+O painel fica em [`https://ambar-site.pages.dev/admin/`](https://ambar-site.pages.dev/admin/) e usa Decap CMS para editar os arquivos JSON versionados no próprio repositório. As coleções disponíveis são **Velas**, **Home sprays** e **Edições especiais**. O botão de publicar grava um commit simples no GitHub; o Cloudflare Pages e o workflow legado do GitHub Pages acompanham a branch `main` enquanto a migração de domínio permanece separada.
 
 ## Quem pode editar
 
@@ -10,7 +10,7 @@ O endereço público do painel não é uma barreira de acesso. A proteção depe
 
 ## Editar um item
 
-1. Abra `/admin/` e entre com o GitHub.
+1. Abra [`https://ambar-site.pages.dev/admin/`](https://ambar-site.pages.dev/admin/) e entre com o GitHub.
 2. Escolha uma das três coleções.
 3. Edite os campos e use a prévia desktop/mobile antes de salvar.
 4. Para ocultar um item sem perder seus dados, desative **Visível no catálogo**. Para remover de vez, use a exclusão e confirme.
@@ -27,7 +27,7 @@ HEIC/HEIF recebe uma mensagem explícita para converter antes do envio. A imagem
 ## Mensagens esperadas
 
 - **Imagem preparada e anexada**: o arquivo processado foi associado ao campo; ainda falta publicar o registro.
-- **Commit concluído, deploy pendente**: o GitHub recebeu a alteração, mas a hospedagem ainda precisa executar o workflow.
+- **Commit concluído, deploy pendente**: o GitHub recebeu a alteração; aguarde o build automático do Cloudflare Pages ou do GitHub Pages e confira o endereço publicado antes de considerar a mudança disponível.
 - **Sessão expirada ou não confere**: refaça o login; o estado OAuth é descartado após dez minutos.
 - **O editor não disponibilizou o salvamento de mídia**: recarregue o painel e confira se o login está ativo.
 
