@@ -226,10 +226,10 @@ a { color: inherit; }
 }
 .webgl-candle-fallback__match-flame {
   position: absolute;
-  top: -16%;
-  left: 66%;
-  width: 28%;
-  height: 36%;
+  top: -22%;
+  left: 63%;
+  width: 34%;
+  height: 46%;
   opacity: 0;
   transform: scale(.65);
   transform-origin: 50% 100%;
